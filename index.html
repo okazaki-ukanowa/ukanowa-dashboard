@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>うかのわ 経営管理ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --border: #E2DDD5;
+  --border2: #CCC8C0;
+  --text: #1A1816;
+  --text2: #6B6560;
+  --text3: #9B958E;
+  --green-bg: #E8F4E8;
+  --green-text: #2D6A2D;
+  --green-border: #A8D4A8;
+  --amber-bg: #FDF3E0;
+  --amber-text: #8A5C00;
+  --amber-border: #F0CC80;
+  --red-bg: #FDE8E8;
+  --red-text: #8A2020;
+  --red-border: #F0A8A8;
+  --blue-bg: #E8F0FC;
+  --blue-text: #1A4A9A;
+  --blue-border: #A8C0F0;
+  --accent: #2D6A2D;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.page { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ── Header ── */
+.site-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1.5px solid var(--border2);
+}
+.site-title { font-size: 11px; letter-spacing: 0.12em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+.site-name { font-size: 20px; font-weight: 600; color: var(--text); }
+.header-right { text-align: right; }
+.updated { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.btn-print {
+  margin-top: 6px; display: inline-block;
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  padding: 4px 10px; background: var(--surface); color: var(--text2);
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-print:hover { background: var(--surface2); }
+
+/* ── Metrics ── */
+.metrics {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+  margin-bottom: 1.75rem;
+}
+.met {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 0.875rem 1rem;
+}
+.met-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; margin-bottom: 4px; }
+.met-value { font-size: 22px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
+.met-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ── Section title ── */
+.section-heading {
+  font-size: 10px; letter-spacing: 0.1em; color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 0.75rem; margin-top: 1.75rem;
+}
+
+/* ── Theme cards ── */
+.themes { display: flex; flex-direction: column; gap: 8px; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.875rem 1rem; cursor: pointer;
+  transition: background 0.15s; user-select: none;
+}
+.card-header:hover { background: var(--surface2); }
+
+.card-num {
+  width: 26px; height: 26px; border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+.card-title { font-size: 14px; font-weight: 500; flex: 1; }
+.card-progress { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-right: 4px; }
+
+.badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 99px;
+  font-weight: 500; border: 1px solid;
+}
+.badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+.badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
+.badge-blue  { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
+.badge-gray  { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
+
+.chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+.card.open .chevron { transform: rotate(180deg); }
+
+.card-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 0.875rem 1rem 1rem;
+}
+.card.open .card-body { display: block; }
+
+/* ── Two-col layout inside card ── */
+.card-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1rem; }
+.col-label {
+  font-size: 10px; letter-spacing: 0.08em; color: var(--text3);
+  font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500;
+}
+
+/* ── Confirmed items ── */
+.confirmed-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.confirmed-list li {
+  font-size: 13px; color: var(--text2); padding-left: 14px;
+  position: relative; line-height: 1.55;
+}
+.confirmed-list li::before {
+  content: ''; position: absolute; left: 3px; top: 8px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--border2);
+}
+
+/* ── Action items ── */
+.action-list { display: flex; flex-direction: column; gap: 5px; }
+.action-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 7px 10px; cursor: pointer; transition: background 0.15s;
+  position: relative;
+}
+.action-item:hover { background: var(--border); }
+.action-item.done { opacity: 0.45; }
+.action-item.done .action-text { text-decoration: line-through; }
+
+.action-check {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid var(--border2); background: var(--surface);
+  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
+  justify-content: center; transition: all 0.15s;
+}
+.action-item.done .action-check {
+  background: var(--accent); border-color: var(--accent);
+}
+.action-item.done .action-check::after {
+  content: '✓'; color: white; font-size: 10px; font-weight: 600;
+}
+.action-num {
+  font-size: 10px; font-weight: 500; color: var(--text3);
+  font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px;
+  min-width: 16px;
+}
+.action-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
+
+/* ── Memo ── */
+.memo-area {
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--border);
+}
+.memo-label {
+  font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace;
+  letter-spacing: 0.08em; margin-bottom: 5px;
+}
+.memo-input {
+  width: 100%; min-height: 56px; resize: vertical;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface2); color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
+  padding: 8px 10px; outline: none; transition: border 0.15s;
+  line-height: 1.55;
+}
+.memo-input:focus { border-color: var(--border2); background: var(--surface); }
+.memo-input::placeholder { color: var(--text3); }
+
+/* ── Finance summary ── */
+.finance-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px; margin-bottom: 1rem;
+}
+.fin-cell {
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 0.625rem 0.75rem;
+}
+.fin-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+.fin-value { font-size: 16px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); }
+.fin-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* ── Loan table ── */
+.loan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.loan-table th {
+  font-size: 10px; font-weight: 500; color: var(--text3);
+  padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace; white-space: nowrap;
+}
+.loan-table th:first-child { text-align: left; }
+.loan-table td {
+  padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Mono', monospace;
+}
+.loan-table td:first-child { text-align: left; font-family: 'Noto Sans JP', sans-serif; color: var(--text2); }
+.loan-table tr:last-child td { border-bottom: none; font-weight: 600; color: var(--text); }
+
+/* ── Color accents per theme ── */
+.t1 .card-num { background: #E8F4E8; color: #2D6A2D; }
+.t2 .card-num { background: #E8F0FC; color: #1A4A9A; }
+.t3 .card-num { background: #FDF3E0; color: #8A5C00; }
+.t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
+.t5 .card-num { background: #FCE8F0; color: #9A1A50; }
+
+/* ── Reset button ── */
+.btn-reset {
+  font-size: 11px; color: var(--text3); background: none;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 3px 10px; cursor: pointer; font-family: 'DM Mono', monospace;
+  margin-top: 4px;
+}
+.btn-reset:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
+
+/* ── Footer ── */
+.footer {
+  margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* ── Print ── */
+@media print {
+  body { background: white; font-size: 12px; }
+  .btn-print, .btn-reset, .memo-input { display: none; }
+  .card { break-inside: avoid; border: 1px solid #ccc; }
+  .card-body { display: block !important; }
+  .chevron { display: none; }
+  .page { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="site-header">
+    <div>
+      <div class="site-title">UKANOWA / 岡崎仁志</div>
+      <div class="site-name">経営管理ダッシュボード</div>
+    </div>
+    <div class="header-right">
+      <div class="updated" id="updated-date">更新日: —</div>
+      <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="met">
+      <div class="met-label">令和7年 所得</div>
+      <div class="met-value">1,230万</div>
+      <div class="met-sub">所得率 約44%（業界平均を大幅超）</div>
+    </div>
+    <div class="met">
+      <div class="met-label">借入残高（前島除く）</div>
+      <div class="met-value">2,534万</div>
+      <div class="met-sub">年間返済 256万円</div>
+    </div>
+    <div class="met">
+      <div class="met-label">新規投資総額</div>
+      <div class="met-value">5,750万</div>
+      <div class="met-sub">倉庫4,500 + 設備自己負担1,250</div>
+    </div>
+    <div class="met">
+      <div class="met-label">経営面積</div>
+      <div class="met-value">12→30ha</div>
+      <div class="met-sub">拡大進行中（8年目）</div>
+    </div>
+  </div>
+
+  <!-- Finance detail -->
+  <div class="section-heading">FINANCIAL — 借入残高明細（令和8年3月現在）</div>
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num" style="background:#F0EDE6;color:#6B6560;">¥</div>
+      <span class="card-title">借入残高・償還計画</span>
+      <span class="badge badge-gray">参照用</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <table class="loan-table">
+        <thead>
+          <tr>
+            <th>借入先・用途</th>
+            <th>貸付額</th>
+            <th>現残高</th>
+            <th>年間返済</th>
+            <th>利率</th>
+            <th>完済</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>公庫① 乾燥機等</td><td>420万</td><td>360万</td><td>60万</td><td>0.00%</td><td>R13</td></tr>
+          <tr><td>公庫② トラクター・倉庫</td><td>1,390万</td><td>1,390万</td><td>100万</td><td>0.00%</td><td>R21</td></tr>
+          <tr><td>公庫③ コンバイン</td><td>280万</td><td>280万</td><td>40万</td><td>0.60%</td><td>R15</td></tr>
+          <tr><td>JA 管理・播種・除草</td><td>561万</td><td>504万</td><td>56万</td><td>0.20%</td><td>R16</td></tr>
+          <tr><td>合計（前島除く）</td><td>2,651万</td><td>2,534万</td><td>256万</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="memo-area">
+        <div class="memo-label">MEMO</div>
+        <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-finance" oninput="saveMemo(this)"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Themes -->
+  <div class="section-heading">THEMES — テーマ別進捗</div>
+  <div class="themes">
+
+    <!-- ① 融資 -->
+    <div class="card t1" id="card-1">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-num">①</div>
+        <span class="card-title">融資・資金調達戦略</span>
+        <span class="card-progress" id="prog-1"></span>
+        <span class="badge badge-amber">進行中</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cols">
+          <div>
+            <div class="col-label">CONFIRMED — 確定事項</div>
+            <ul class="confirmed-list">
+              <li>農業改良資金（0%・12年）→ 倉庫4,500万円に充当</li>
+              <li>スーパーL 目標地図枠（2.70%）→ 設備自己負担1,250万円に充当</li>
+              <li>据置5年 + 返済20年を基本軸で検討中</li>
+              <li>みどりの食料システム法 認定取得済み</li>
+              <li>補助事業設備との併用不可のため用途分離済み</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">NEXT ACTIONS</div>
+            <div class="action-list" data-theme="1">
+              <div class="action-item" onclick="toggleAction(this)" data-key="1-1">
+                <div class="action-check"></div>
+                <span class="action-num">01</span>
+                <span class="action-text">農業改良資金5,000万円枠・倉庫適用を公庫に電話確認（訪問前）</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="1-2">
+                <div class="action-check"></div>
+                <span class="action-num">02</span>
+                <span class="action-text">年次キャッシュフロー表（5〜10年）を作成</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="1-3">
+                <div class="action-check"></div>
+                <span class="action-num">03</span>
+                <span class="action-text">目標地図（人農地プラン）位置づけ確認書類を松山市から入手</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="1-4">
+                <div class="action-check"></div>
+                <span class="action-num">04</span>
+                <span class="action-text">日本政策金融公庫を訪問（今月中）</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="memo-area">
+          <div class="memo-label">MEMO</div>
+          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-1" oninput="saveMemo(this)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② スマ転 -->
+    <div class="card t2" id="card-2">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-num">②</div>
+        <span class="card-title">スマ転・補助申請準備</span>
+        <span class="card-progress" id="prog-2"></span>
+        <span class="badge badge-blue">令和9年度目標</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cols">
+          <div>
+            <div class="col-label">CONFIRMED — 確定事項</div>
+            <ul class="confirmed-list">
+              <li>令和8年度申請は断念、令和9年度に照準</li>
+              <li>申請軸：RTK自動操舵 + RTKレベラーによるほ場均平化</li>
+              <li>ザルビオ地力マップ活用の有機元肥可変設計（検討中）</li>
+              <li>生産方式革新実施計画（スマ農法認定）取得で採点＋7点</li>
+              <li>有機農業等拡大支援事業（後継）との2本立て申請予定</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">NEXT ACTIONS</div>
+            <div class="action-list" data-theme="2">
+              <div class="action-item" onclick="toggleAction(this)" data-key="2-1">
+                <div class="action-check"></div>
+                <span class="action-num">01</span>
+                <span class="action-text">中国四国農政局へ生産方式革新実施計画の事前相談（最優先）</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="2-2">
+                <div class="action-check"></div>
+                <span class="action-num">02</span>
+                <span class="action-text">今治ヤンマー・ヤンマーアグリジャパンから2社見積取得</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="2-3">
+                <div class="action-check"></div>
+                <span class="action-num">03</span>
+                <span class="action-text">補助申請に向けた実需者との覚書（MOU）準備</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="memo-area">
+          <div class="memo-label">MEMO</div>
+          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-2" oninput="saveMemo(this)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 輸出 -->
+    <div class="card t3" id="card-3">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-num">③</div>
+        <span class="card-title">輸出市場開拓（香港・台湾）</span>
+        <span class="card-progress" id="prog-3"></span>
+        <span class="badge badge-gray">検討中</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cols">
+          <div>
+            <div class="col-label">CONFIRMED — 確定事項</div>
+            <ul class="confirmed-list">
+              <li>香港が最優先候補（関税ゼロ・輸入許可不要・既存市場あり）</li>
+              <li>有機JAS認証米を対象、台湾も候補</li>
+              <li>直販は生産量の約30%・完売状態</li>
+              <li>ジェトロ愛媛: 089-933-2380</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">NEXT ACTIONS</div>
+            <div class="action-list" data-theme="3">
+              <div class="action-item" onclick="toggleAction(this)" data-key="3-1">
+                <div class="action-check"></div>
+                <span class="action-num">01</span>
+                <span class="action-text">ジェトロ愛媛へ相談アポイントを取る（TEL: 089-933-2380）</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="3-2">
+                <div class="action-check"></div>
+                <span class="action-num">02</span>
+                <span class="action-text">香港向け輸出スキーム・価格設定の確認</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="memo-area">
+          <div class="memo-label">MEMO</div>
+          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-3" oninput="saveMemo(this)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 加工 -->
+    <div class="card t4" id="card-4">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-num">④</div>
+        <span class="card-title">米加工ライン整備</span>
+        <span class="card-progress" id="prog-4"></span>
+        <span class="badge badge-gray">検討中</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cols">
+          <div>
+            <div class="col-label">CONFIRMED — 確定事項</div>
+            <ul class="confirmed-list">
+              <li>VP-200（マルタカテクノ）を中心に検討・650万円（本体のみ）</li>
+              <li>代替候補：のむら産業パッカーシリーズ、東洋ライスVR-200</li>
+              <li>真空包装袋：福助工業（四国中央市・0896-24-1111）</li>
+              <li>補助率1/2のタイミングで自動化ラインに投資予定</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">NEXT ACTIONS</div>
+            <div class="action-list" data-theme="4">
+              <div class="action-item" onclick="toggleAction(this)" data-key="4-1">
+                <div class="action-check"></div>
+                <span class="action-num">01</span>
+                <span class="action-text">マルタカテクノとVP-200中心の打合せ実施</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="4-2">
+                <div class="action-check"></div>
+                <span class="action-num">02</span>
+                <span class="action-text">補助申請に向けた2社見積の取得</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="memo-area">
+          <div class="memo-label">MEMO</div>
+          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-4" oninput="saveMemo(this)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 税理士・法人化 -->
+    <div class="card t5" id="card-5">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-num">⑤</div>
+        <span class="card-title">税理士変更・法人化</span>
+        <span class="card-progress" id="prog-5"></span>
+        <span class="badge badge-gray">検討中</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cols">
+          <div>
+            <div class="col-label">CONFIRMED — 確定事項</div>
+            <ul class="confirmed-list">
+              <li>現在の大阪拠点の税理士に変更を検討中</li>
+              <li>重松修税理士事務所（松山市・農業専門・JAえひめ中央顧問）が有力候補</li>
+              <li>法人化はスマ転申請との認定継続性問題の整理が必要</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">NEXT ACTIONS</div>
+            <div class="action-list" data-theme="5">
+              <div class="action-item" onclick="toggleAction(this)" data-key="5-1">
+                <div class="action-check"></div>
+                <span class="action-num">01</span>
+                <span class="action-text">重松修税理士事務所へ相談アポイントを取る</span>
+              </div>
+              <div class="action-item" onclick="toggleAction(this)" data-key="5-2">
+                <div class="action-check"></div>
+                <span class="action-num">02</span>
+                <span class="action-text">法人化タイミングとスマ転認定継続性の整合性を確認</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="memo-area">
+          <div class="memo-label">MEMO</div>
+          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-5" oninput="saveMemo(this)"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /themes -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411</span>
+    <button class="btn-reset" onclick="resetAll()">チェックをリセット</button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const STORAGE_KEY = 'ukanowa_dash_v1';
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function setState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+// 更新日
+document.getElementById('updated-date').textContent = '更新日: ' + new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
+
+// カード開閉
+function toggleCard(header) {
+  const card = header.closest('.card');
+  card.classList.toggle('open');
+  const s = getState();
+  const id = card.id;
+  if (!s.open) s.open = {};
+  s.open[id] = card.classList.contains('open');
+  setState(s);
+}
+
+// アクションチェック
+function toggleAction(item) {
+  item.classList.toggle('done');
+  const key = item.dataset.key;
+  const s = getState();
+  if (!s.actions) s.actions = {};
+  s.actions[key] = item.classList.contains('done');
+  setState(s);
+  updateProgress(key.split('-')[0]);
+}
+
+// メモ保存
+function saveMemo(el) {
+  const s = getState();
+  if (!s.memos) s.memos = {};
+  s.memos[el.dataset.key] = el.value;
+  setState(s);
+}
+
+// 進捗表示
+function updateProgress(themeId) {
+  const items = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item`);
+  const done = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item.done`);
+  const el = document.getElementById('prog-' + themeId);
+  if (el && items.length) el.textContent = done.length + '/' + items.length;
+}
+
+// リセット
+function resetAll() {
+  if (!confirm('すべてのチェックをリセットしますか？\n（メモは保持されます）')) return;
+  const s = getState();
+  s.actions = {};
+  setState(s);
+  document.querySelectorAll('.action-item').forEach(el => el.classList.remove('done'));
+  [1,2,3,4,5].forEach(i => updateProgress(i));
+}
+
+// 初期化（localStorage復元）
+(function init() {
+  const s = getState();
+
+  // カード開閉状態
+  if (s.open) {
+    Object.entries(s.open).forEach(([id, isOpen]) => {
+      const card = document.getElementById(id);
+      if (card && isOpen) card.classList.add('open');
+    });
+  }
+
+  // アクション状態
+  if (s.actions) {
+    Object.entries(s.actions).forEach(([key, isDone]) => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      if (el && isDone) el.classList.add('done');
+    });
+  }
+
+  // メモ復元
+  if (s.memos) {
+    Object.entries(s.memos).forEach(([key, val]) => {
+      const el = document.querySelector(`.memo-input[data-key="${key}"]`);
+      if (el) el.value = val;
+    });
+  }
+
+  // 進捗表示
+  [1,2,3,4,5].forEach(i => updateProgress(i));
+})();
+</script>
+</body>
+</html>
