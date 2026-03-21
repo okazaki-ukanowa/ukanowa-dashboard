@@ -49,8 +49,7 @@ body {
 /* ── Header ── */
 .site-header {
   display: flex; align-items: flex-end; justify-content: space-between;
-  margin-bottom: 1.75rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.75rem; padding-bottom: 1rem;
   border-bottom: 1.5px solid var(--border2);
 }
 .site-title { font-size: 11px; letter-spacing: 0.12em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
@@ -71,117 +70,82 @@ body {
   display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
   margin-bottom: 1.75rem;
 }
-.met {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 0.875rem 1rem;
-}
+.met { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.875rem 1rem; }
 .met-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; margin-bottom: 4px; }
 .met-value { font-size: 22px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
 .met-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
 
-/* ── Section title ── */
+/* ── Section heading ── */
 .section-heading {
   font-size: 10px; letter-spacing: 0.1em; color: var(--text3);
   font-family: 'DM Mono', monospace;
   margin-bottom: 0.75rem; margin-top: 1.75rem;
 }
 
-/* ── Theme cards ── */
+/* ── Cards ── */
 .themes { display: flex; flex-direction: column; gap: 8px; }
-
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); overflow: hidden;
-}
-
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .card-header {
   display: flex; align-items: center; gap: 10px;
-  padding: 0.875rem 1rem; cursor: pointer;
-  transition: background 0.15s; user-select: none;
+  padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none;
 }
 .card-header:hover { background: var(--surface2); }
-
 .card-num {
   width: 26px; height: 26px; border-radius: var(--radius);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 600; flex-shrink: 0;
-  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 600; flex-shrink: 0; font-family: 'DM Mono', monospace;
 }
 .card-title { font-size: 14px; font-weight: 500; flex: 1; }
 .card-progress { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-right: 4px; }
-
-.badge {
-  font-size: 10px; padding: 2px 8px; border-radius: 99px;
-  font-weight: 500; border: 1px solid; white-space: nowrap;
-}
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; border: 1px solid; white-space: nowrap; }
 .badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
 .badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
 .badge-blue  { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
 .badge-gray  { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
-
 .chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
 .card.open .chevron { transform: rotate(180deg); }
-
-.card-body {
-  display: none;
-  border-top: 1px solid var(--border);
-  padding: 0.875rem 1rem 1rem;
-}
+.card-body { display: none; border-top: 1px solid var(--border); padding: 0.875rem 1rem 1rem; }
 .card.open .card-body { display: block; }
 
-/* ── Two-col layout inside card ── */
+/* ── Card two-col ── */
 .card-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1rem; }
-.col-label {
-  font-size: 10px; letter-spacing: 0.08em; color: var(--text3);
-  font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500;
-}
+.col-label { font-size: 10px; letter-spacing: 0.08em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500; }
 
-/* ── Confirmed items ── */
+/* ── Confirmed list ── */
 .confirmed-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.confirmed-list li {
-  font-size: 13px; color: var(--text2); padding-left: 14px;
-  position: relative; line-height: 1.55;
-}
-.confirmed-list li::before {
-  content: ''; position: absolute; left: 3px; top: 8px;
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--border2);
-}
+.confirmed-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
+.confirmed-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
 
 /* ── Action items ── */
 .action-list { display: flex; flex-direction: column; gap: 5px; }
 .action-item {
   display: flex; align-items: flex-start; gap: 8px;
   background: var(--surface2); border-radius: var(--radius);
-  padding: 7px 10px; cursor: pointer; transition: background 0.15s;
+  padding: 7px 10px; transition: background 0.15s;
 }
 .action-item:hover { background: var(--border); }
 .action-item.done { opacity: 0.45; }
 .action-item.done .action-text { text-decoration: line-through; }
-
 .action-check {
   width: 16px; height: 16px; border-radius: 4px;
   border: 1.5px solid var(--border2); background: var(--surface);
   flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
-  justify-content: center; transition: all 0.15s;
+  justify-content: center; transition: all 0.15s; cursor: pointer;
 }
+.action-check:hover { border-color: var(--accent); }
 .action-item.done .action-check { background: var(--accent); border-color: var(--accent); }
 .action-item.done .action-check::after { content: '✓'; color: white; font-size: 10px; font-weight: 600; }
-
-.action-num {
-  font-size: 10px; font-weight: 500; color: var(--text3);
-  font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px; min-width: 16px;
-}
+.action-item.updating .action-check { opacity: 0.5; pointer-events: none; }
+.action-num { font-size: 10px; font-weight: 500; color: var(--text3); font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px; min-width: 16px; }
 .action-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
-.action-status {
-  font-size: 9px; padding: 1px 6px; border-radius: 99px; font-weight: 500;
-  border: 1px solid; align-self: center; flex-shrink: 0;
-  background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border);
-}
+.action-status { font-size: 9px; padding: 1px 6px; border-radius: 99px; font-weight: 500; border: 1px solid; align-self: center; flex-shrink: 0; background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
 
 /* ── Memo ── */
 .memo-area { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--border); }
-.memo-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; margin-bottom: 5px; }
+.memo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.memo-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; }
+.memo-save-indicator { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; opacity: 0; transition: opacity 0.3s; }
+.memo-save-indicator.visible { opacity: 1; }
 .memo-input {
   width: 100%; min-height: 56px; resize: vertical;
   border: 1px solid var(--border); border-radius: var(--radius);
@@ -195,26 +159,41 @@ body {
 /* ── Loan table ── */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .loan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.loan-table th {
-  font-size: 10px; font-weight: 500; color: var(--text3);
-  padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border);
-  font-family: 'DM Mono', monospace; white-space: nowrap;
-}
+.loan-table th { font-size: 10px; font-weight: 500; color: var(--text3); padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; white-space: nowrap; }
 .loan-table th:first-child { text-align: left; }
-.loan-table td {
-  padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border);
-  color: var(--text); font-family: 'DM Mono', monospace; white-space: nowrap;
-}
+.loan-table td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; white-space: nowrap; }
 .loan-table td:first-child { text-align: left; font-family: 'Noto Sans JP', sans-serif; color: var(--text2); }
 .loan-table tr:last-child td { border-bottom: none; font-weight: 600; color: var(--text); }
 
-/* ── Color accents per theme ── */
+/* ── Theme color accents ── */
 .t1 .card-num { background: #E8F4E8; color: #2D6A2D; }
 .t2 .card-num { background: #E8F0FC; color: #1A4A9A; }
 .t3 .card-num { background: #FDF3E0; color: #8A5C00; }
 .t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
 .t5 .card-num { background: #FCE8F0; color: #9A1A50; }
 .t6 .card-num { background: #E8F5F5; color: #1A6A6A; }
+
+/* ── Loading & Error ── */
+.loading {
+  display: flex; align-items: center; gap: 12px;
+  padding: 2rem; color: var(--text3); font-family: 'DM Mono', monospace; font-size: 12px;
+}
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border2); border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-msg {
+  padding: 1.25rem 1.5rem; background: var(--red-bg); border: 1px solid var(--red-border);
+  border-radius: var(--radius-lg); color: var(--red-text); font-size: 13px; line-height: 1.6;
+}
+.error-msg button {
+  margin-top: 0.75rem; padding: 4px 14px; font-size: 12px; font-family: 'DM Mono', monospace;
+  background: var(--surface); border: 1px solid var(--red-border); border-radius: var(--radius);
+  color: var(--red-text); cursor: pointer;
+}
+.error-msg button:hover { background: var(--red-bg); }
 
 /* ── Reset button ── */
 .btn-reset {
@@ -231,7 +210,7 @@ body {
   display: flex; justify-content: space-between; align-items: center;
 }
 
-/* ── Responsive (mobile) ── */
+/* ── Responsive ── */
 @media (max-width: 480px) {
   .page { padding: 1rem 0.75rem 3rem; }
   .site-header { margin-bottom: 1.25rem; }
@@ -257,7 +236,7 @@ body {
 /* ── Print ── */
 @media print {
   body { background: white; font-size: 12px; }
-  .btn-print, .btn-reset, .memo-input { display: none; }
+  .btn-print, .btn-reset, .memo-input, .loading, .error-msg { display: none; }
   .card { break-inside: avoid; border: 1px solid #ccc; }
   .card-body { display: block !important; }
   .chevron { display: none; }
@@ -280,7 +259,7 @@ body {
     </div>
   </div>
 
-  <!-- Metrics -->
+  <!-- Metrics (static) -->
   <div class="metrics">
     <div class="met">
       <div class="met-label">令和7年 所得</div>
@@ -304,7 +283,7 @@ body {
     </div>
   </div>
 
-  <!-- Finance -->
+  <!-- Finance (static) -->
   <div class="section-heading">FINANCIAL — 借入残高明細（令和8年3月現在）</div>
   <div class="card">
     <div class="card-header" onclick="toggleCard(this)">
@@ -317,9 +296,7 @@ body {
       <div class="table-wrap">
         <table class="loan-table">
           <thead>
-            <tr>
-              <th>借入先・用途</th><th>貸付額</th><th>現残高</th><th>年間返済</th><th>利率</th><th>完済</th>
-            </tr>
+            <tr><th>借入先・用途</th><th>貸付額</th><th>現残高</th><th>年間返済</th><th>利率</th><th>完済</th></tr>
           </thead>
           <tbody>
             <tr><td>公庫① 乾燥機等</td><td>420万</td><td>360万</td><td>60万</td><td>0.00%</td><td>R13</td></tr>
@@ -330,294 +307,17 @@ body {
           </tbody>
         </table>
       </div>
-      <div class="memo-area">
-        <div class="memo-label">MEMO</div>
-        <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-finance" oninput="saveMemo(this)"></textarea>
-      </div>
     </div>
   </div>
 
-  <!-- Themes -->
+  <!-- Themes (動的描画) -->
   <div class="section-heading">THEMES — テーマ別進捗</div>
-  <div class="themes">
-
-    <!-- ① 融資・資金調達戦略 | テーマDB番号:1 | タスクDB テーマ:資金調達 -->
-    <div class="card t1" id="card-1">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">①</div>
-        <span class="card-title">融資・資金調達戦略</span>
-        <span class="card-progress" id="prog-1"></span>
-        <span class="badge badge-amber">進行中</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>農業改良資金（0%・12年）→ 倉庫4,500万円に充当</li>
-              <li>スーパーL 目標地図枠（2.70%）→ 設備自己負担1,250万円に充当</li>
-              <li>据置5年 + 返済20年を基本軸で検討中</li>
-              <li>みどりの食料システム法 認定取得済み</li>
-              <li>補助事業設備との併用不可のため用途分離済み</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="1">
-              <div class="action-item" onclick="toggleAction(this)" data-key="1-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">農業改良資金5,000万円枠・倉庫適用を公庫に電話確認（訪問前）</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="1-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">日本政策金融公庫への訪問</span>
-                <span class="action-status">進行中</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="1-3">
-                <div class="action-check"></div>
-                <span class="action-num">03</span>
-                <span class="action-text">目標地図（人農地プラン）位置づけ確認書類を松山市から入手</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="1-4">
-                <div class="action-check"></div>
-                <span class="action-num">04</span>
-                <span class="action-text">年次キャッシュフロー表（5〜10年）を作成</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-1" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
+  <div class="themes" id="themes-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Notionからデータを取得中...</span>
     </div>
-
-    <!-- ② スマ転・補助申請準備 | テーマDB番号:2 | タスクDB テーマ:補助金申請 -->
-    <div class="card t2" id="card-2">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">②</div>
-        <span class="card-title">スマ転・補助申請準備</span>
-        <span class="card-progress" id="prog-2"></span>
-        <span class="badge badge-blue">令和9年度目標</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>令和8年度申請は断念、令和9年度に照準</li>
-              <li>申請軸：RTK自動操舵 + RTKレベラーによるほ場均平化</li>
-              <li>ザルビオ地力マップ活用の有機元肥可変設計（検討中）</li>
-              <li>生産方式革新実施計画（スマ農法認定）取得で採点＋7点</li>
-              <li>有機農業等拡大支援事業（後継）との2本立て申請予定</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="2">
-              <div class="action-item" onclick="toggleAction(this)" data-key="2-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">中国四国農政局へ生産方式革新実施計画の事前相談</span>
-                <span class="action-status">進行中</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="2-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">今治ヤンマー・ヤンマーアグリジャパンから2社見積取得</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="2-3">
-                <div class="action-check"></div>
-                <span class="action-num">03</span>
-                <span class="action-text">補助申請に向けた実需者との覚書（MOU）準備</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-2" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ③ 輸出市場開拓（香港・台湾）| テーマDB番号:3 | タスクDB テーマ:輸出 -->
-    <div class="card t3" id="card-3">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">③</div>
-        <span class="card-title">輸出市場開拓（香港・台湾）</span>
-        <span class="card-progress" id="prog-3"></span>
-        <span class="badge badge-gray">検討中</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>香港が最優先候補（関税ゼロ・輸入許可不要・既存市場あり）</li>
-              <li>有機JAS認証米を対象、台湾も候補</li>
-              <li>直販は生産量の約30%・完売状態</li>
-              <li>ジェトロ愛媛: 089-933-2380</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="3">
-              <div class="action-item" onclick="toggleAction(this)" data-key="3-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">ジェトロ愛媛へ輸出相談</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="3-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">香港向け輸出スキーム・価格設定の確認</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-3" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ④ 米加工ライン整備 | テーマDB番号:4 | タスクDB テーマ:加工・販売 -->
-    <div class="card t4" id="card-4">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">④</div>
-        <span class="card-title">米加工ライン整備</span>
-        <span class="card-progress" id="prog-4"></span>
-        <span class="badge badge-gray">検討中</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>VP-200（マルタカテクノ）を中心に検討・650万円（本体のみ）</li>
-              <li>代替候補：のむら産業パッカーシリーズ、東洋ライスVR-200</li>
-              <li>真空包装袋：福助工業（四国中央市・0896-24-1111）</li>
-              <li>補助率1/2のタイミングで自動化ラインに投資予定</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="4">
-              <div class="action-item" onclick="toggleAction(this)" data-key="4-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">マルタカテクノとVP-200中心の打合せ実施</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="4-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">加工ライン補助申請に向けた2社見積の取得</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-4" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ⑤ 税理士変更・法人化 | テーマDB番号:5 | タスクDB テーマ:経営基盤 -->
-    <div class="card t5" id="card-5">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">⑤</div>
-        <span class="card-title">税理士変更・法人化</span>
-        <span class="card-progress" id="prog-5"></span>
-        <span class="badge badge-gray">検討中</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>現在の大阪拠点の税理士に変更を検討中</li>
-              <li>重松修税理士事務所（松山市・農業専門・JAえひめ中央顧問）が有力候補</li>
-              <li>法人化はスマ転申請との認定継続性問題の整理が必要</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="5">
-              <div class="action-item" onclick="toggleAction(this)" data-key="5-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">重松修税理士事務所へ相談</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="5-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">法人化タイミング検討</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-5" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ⑥ 設備投資・施設整備 | タスクDB テーマ:設備投資（テーマDB未登録） -->
-    <div class="card t6" id="card-6">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-num">⑥</div>
-        <span class="card-title">設備投資・施設整備</span>
-        <span class="card-progress" id="prog-6"></span>
-        <span class="badge badge-gray">検討中</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="card-body">
-        <div class="card-cols">
-          <div>
-            <div class="col-label">CONFIRMED — 確定事項</div>
-            <ul class="confirmed-list">
-              <li>乾燥調整精米施設（ライスセンター）の新設を検討中</li>
-              <li>倉庫4,500万円・設備自己負担1,250万円が新規投資総額</li>
-              <li>補助率1/2のスマ転補助を活用予定</li>
-              <li>敷地・設計の確定が先決事項</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">NEXT ACTIONS</div>
-            <div class="action-list" data-theme="6">
-              <div class="action-item" onclick="toggleAction(this)" data-key="6-1">
-                <div class="action-check"></div>
-                <span class="action-num">01</span>
-                <span class="action-text">倉庫・ライスセンター設計確定</span>
-              </div>
-              <div class="action-item" onclick="toggleAction(this)" data-key="6-2">
-                <div class="action-check"></div>
-                <span class="action-num">02</span>
-                <span class="action-text">精米ライン見積取得</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="memo-area">
-          <div class="memo-label">MEMO</div>
-          <textarea class="memo-input" placeholder="メモを入力..." data-key="memo-6" oninput="saveMemo(this)"></textarea>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /themes -->
+  </div>
 
   <!-- Footer -->
   <div class="footer">
@@ -628,18 +328,77 @@ body {
 </div><!-- /page -->
 
 <script>
-const STORAGE_KEY = 'ukanowa_dash_v1';
+// ── 定数 ──────────────────────────────────────────────
+const WORKER    = 'https://ukanowa-api.commonground-oka.workers.dev';
+const THEME_DB  = '51e310b0f1114e11856b9eac6703f04a';
+const TASK_DB   = '32843c0d-960c-80dc-a210-c0b3b7e60ee7';
 
-function getState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+// テーマDB テーマ名 → タスクDB テーマ値 対応表
+const THEME_TASK_MAP = {
+  '融資・資金調達戦略': '資金調達',
+  'スマ転・補助申請準備': '補助金申請',
+  '輸出市場開拓（香港・台湾）': '輸出',
+  '米加工ライン整備': '加工・販売',
+  '税理士変更・法人化': '経営基盤',
+  '設備投資・施設整備': '設備投資',
+};
+
+const BADGE_CLASS = {
+  '進行中': 'badge-amber',
+  '令和9年度目標': 'badge-blue',
+  '検討中': 'badge-gray',
+  '完了': 'badge-green',
+};
+
+const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
+const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
+const STORAGE_KEY = 'ukanowa_dash_v2';
+
+// ── Worker API ────────────────────────────────────────
+async function queryDB(dbId, opts = {}) {
+  const res = await fetch(`${WORKER}/databases/${dbId}/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(opts),
+  });
+  if (!res.ok) throw new Error(`DB取得エラー: ${res.status} ${res.statusText}`);
+  return res.json();
 }
-function setState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
-// 更新日
-document.getElementById('updated-date').textContent =
-  '更新日: ' + new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
+async function patchPage(pageId, properties) {
+  const res = await fetch(`${WORKER}/pages/${pageId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ properties }),
+  });
+  if (!res.ok) throw new Error(`更新エラー: ${res.status} ${res.statusText}`);
+  return res.json();
+}
 
-// カード開閉
+// ── Notion プロパティ取得ヘルパー ─────────────────────
+const getTitle = (page, key = 'テーマ名') => {
+  const p = page.properties[key] || page.properties['名前'];
+  return p?.title?.[0]?.plain_text || '';
+};
+const getRichText = (page, key) =>
+  page.properties[key]?.rich_text?.[0]?.plain_text || '';
+const getSelect = (page, key) =>
+  page.properties[key]?.select?.name || '';
+const getStatus = (page, key) =>
+  page.properties[key]?.status?.name || '';
+const getNumber = (page, key) =>
+  page.properties[key]?.number ?? 0;
+
+// ── HTML エスケープ ────────────────────────────────────
+const esc = s => String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;');
+
+// ── localStorage ────────────────────────────────────────
+const getState = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } };
+const setState = s  => localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+
+// ── カード開閉 ────────────────────────────────────────
 function toggleCard(header) {
   const card = header.closest('.card');
   card.classList.toggle('open');
@@ -649,70 +408,236 @@ function toggleCard(header) {
   setState(s);
 }
 
-// アクションチェック
-function toggleAction(item) {
-  item.classList.toggle('done');
-  const key = item.dataset.key;
-  const s = getState();
-  if (!s.actions) s.actions = {};
-  s.actions[key] = item.classList.contains('done');
-  setState(s);
-  updateProgress(key.split('-')[0]);
-}
+// ── チェックボックス ON/OFF → Notion ステータス更新 ────
+async function toggleTask(checkEl) {
+  const item = checkEl.closest('.action-item');
+  const pageId = item.dataset.pageId;
+  if (!pageId) return;
 
-// メモ保存
-function saveMemo(el) {
-  const s = getState();
-  if (!s.memos) s.memos = {};
-  s.memos[el.dataset.key] = el.value;
-  setState(s);
-}
+  const wasDone = item.classList.contains('done');
+  const newStatus = wasDone ? '未着手' : '完了';
 
-// 進捗表示
-function updateProgress(themeId) {
-  const items = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item`);
-  const done  = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item.done`);
-  const el = document.getElementById('prog-' + themeId);
-  if (el && items.length) el.textContent = done.length + '/' + items.length;
-}
+  // 楽観的UI更新
+  item.classList.toggle('done', !wasDone);
+  item.classList.add('updating');
+  updateProgress(item.closest('.action-list'));
 
-// リセット
-function resetAll() {
-  if (!confirm('すべてのチェックをリセットしますか？\n（メモは保持されます）')) return;
-  const s = getState();
-  s.actions = {};
-  setState(s);
-  document.querySelectorAll('.action-item').forEach(el => el.classList.remove('done'));
-  [1,2,3,4,5,6].forEach(i => updateProgress(i));
-}
-
-// 初期化（localStorage復元）
-(function init() {
-  const s = getState();
-
-  if (s.open) {
-    Object.entries(s.open).forEach(([id, isOpen]) => {
-      const card = document.getElementById(id);
-      if (card && isOpen) card.classList.add('open');
+  try {
+    await patchPage(pageId, {
+      'ステータス': { status: { name: newStatus } },
     });
+  } catch (e) {
+    console.error('ステータス更新失敗:', e);
+    // ロールバック
+    item.classList.toggle('done', wasDone);
+    updateProgress(item.closest('.action-list'));
+    showToast('ステータスの更新に失敗しました');
+  } finally {
+    item.classList.remove('updating');
   }
+}
 
-  if (s.actions) {
-    Object.entries(s.actions).forEach(([key, isDone]) => {
-      const el = document.querySelector(`[data-key="${key}"]`);
-      if (el && isDone) el.classList.add('done');
-    });
+// ── 進捗カウンター更新 ─────────────────────────────────
+function updateProgress(list) {
+  if (!list) return;
+  const themeNum = list.dataset.theme;
+  const total = list.querySelectorAll('.action-item').length;
+  const done  = list.querySelectorAll('.action-item.done').length;
+  const el = document.getElementById('prog-' + themeNum);
+  if (el && total) el.textContent = `${done}/${total}`;
+}
+
+// ── メモ保存（1秒デバウンス）→ テーマDB メモ更新 ────────
+const memoTimers = {};
+function scheduleMemoSave(textarea) {
+  const notionId = textarea.dataset.notionId;
+  if (!notionId) return;
+
+  // 保存中インジケータ表示
+  const indicator = textarea.closest('.memo-area')?.querySelector('.memo-save-indicator');
+  if (indicator) { indicator.textContent = '...'; indicator.classList.add('visible'); }
+
+  clearTimeout(memoTimers[notionId]);
+  memoTimers[notionId] = setTimeout(async () => {
+    try {
+      await patchPage(notionId, {
+        'メモ': { rich_text: [{ type: 'text', text: { content: textarea.value } }] },
+      });
+      if (indicator) { indicator.textContent = '保存済み ✓'; }
+    } catch (e) {
+      console.error('メモ保存失敗:', e);
+      if (indicator) { indicator.textContent = '保存失敗 ✕'; }
+      showToast('メモの保存に失敗しました');
+    } finally {
+      setTimeout(() => {
+        if (indicator) indicator.classList.remove('visible');
+      }, 2000);
+    }
+  }, 1000);
+}
+
+// ── トースト通知 ────────────────────────────────────────
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#1A1816;color:#fff;font-size:12px;font-family:"DM Mono",monospace;padding:8px 14px;border-radius:8px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(t);
   }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
 
-  if (s.memos) {
-    Object.entries(s.memos).forEach(([key, val]) => {
-      const el = document.querySelector(`.memo-input[data-key="${key}"]`);
-      if (el) el.value = val;
-    });
+// ── テーマカード HTML 生成 ─────────────────────────────
+function buildThemeCard(theme, idx, tasksByTheme) {
+  const num      = getNumber(theme, '番号') || (idx + 1);
+  const name     = getTitle(theme, 'テーマ名');
+  const badge    = getSelect(theme, 'ステータスバッジ');
+  const confirmed = getRichText(theme, '確定事項');
+  const memo     = getRichText(theme, 'メモ');
+  const colorCls = THEME_COLOR[(num - 1)] || 't6';
+  const numChar  = NUM_CHARS[(num - 1)]   || `⑥`;
+  const badgeCls = BADGE_CLASS[badge]     || 'badge-gray';
+  const cardId   = `card-${num}`;
+  const isOpen   = getState().open?.[cardId];
+
+  // タスクを取得（テーマ名マッピング）
+  const taskKey = THEME_TASK_MAP[name] || name;
+  const tasks   = (tasksByTheme[taskKey] || []).slice().sort((a, b) => {
+    const sa = getStatus(a, 'ステータス'), sb = getStatus(b, 'ステータス');
+    const pa = getSelect(a, '優先度'),     pb = getSelect(b, '優先度');
+    if (sa === '進行中' && sb !== '進行中') return -1;
+    if (sb === '進行中' && sa !== '進行中') return  1;
+    if (pa.includes('🔴') && !pb.includes('🔴')) return -1;
+    if (pb.includes('🔴') && !pa.includes('🔴')) return  1;
+    return 0;
+  });
+
+  const doneCnt = tasks.filter(t => getStatus(t, 'ステータス') === '完了').length;
+  const progTxt = tasks.length ? `${doneCnt}/${tasks.length}` : '';
+
+  // 確定事項
+  const confirmedHTML = confirmed
+    ? confirmed.split('\n').filter(l => l.trim())
+        .map(l => `<li>${esc(l.trim())}</li>`).join('')
+    : '<li style="color:var(--text3);font-size:12px;">（未設定）</li>';
+
+  // タスク
+  const tasksHTML = tasks.length
+    ? tasks.map((task, i) => {
+        const status     = getStatus(task, 'ステータス');
+        const isDone     = status === '完了';
+        const isProgress = status === '進行中';
+        return `
+        <div class="action-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
+          <div class="action-check" onclick="toggleTask(this)"></div>
+          <span class="action-num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="action-text">${esc(getTitle(task, '名前'))}</span>
+          ${isProgress ? '<span class="action-status">進行中</span>' : ''}
+        </div>`;
+      }).join('')
+    : '<p style="font-size:12px;color:var(--text3);padding:4px 0;">タスクなし</p>';
+
+  return `
+  <div class="card ${colorCls}${isOpen ? ' open' : ''}" id="${cardId}" data-notion-id="${theme.id}">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num">${numChar}</div>
+      <span class="card-title">${esc(name)}</span>
+      <span class="card-progress" id="prog-${num}">${progTxt}</span>
+      <span class="badge ${badgeCls}">${esc(badge)}</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-cols">
+        <div>
+          <div class="col-label">CONFIRMED — 確定事項</div>
+          <ul class="confirmed-list">${confirmedHTML}</ul>
+        </div>
+        <div>
+          <div class="col-label">NEXT ACTIONS</div>
+          <div class="action-list" data-theme="${num}">${tasksHTML}</div>
+        </div>
+      </div>
+      <div class="memo-area">
+        <div class="memo-header">
+          <div class="memo-label">MEMO</div>
+          <span class="memo-save-indicator"></span>
+        </div>
+        <textarea class="memo-input"
+          placeholder="メモを入力..."
+          data-notion-id="${theme.id}"
+          oninput="scheduleMemoSave(this)">${esc(memo)}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── チェックリセット ───────────────────────────────────
+async function resetAll() {
+  if (!confirm('すべてのチェックをリセットしますか？\nNotionのステータスも「未着手」に戻ります。')) return;
+
+  const items = document.querySelectorAll('.action-item.done');
+  if (!items.length) { showToast('リセット対象がありません'); return; }
+
+  for (const item of items) {
+    const pageId = item.dataset.pageId;
+    if (!pageId) continue;
+    item.classList.remove('done');
+    try {
+      await patchPage(pageId, { 'ステータス': { status: { name: '未着手' } } });
+    } catch (e) {
+      console.error('リセット失敗:', e);
+    }
   }
+  document.querySelectorAll('.action-list').forEach(list => updateProgress(list));
+  showToast('リセット完了');
+}
 
-  [1,2,3,4,5,6].forEach(i => updateProgress(i));
-})();
+// ── メイン初期化 ────────────────────────────────────────
+async function init() {
+  document.getElementById('updated-date').textContent =
+    '更新日: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const container = document.getElementById('themes-container');
+
+  try {
+    // テーマDB・タスクDB を並行取得
+    const [themesRes, tasksRes] = await Promise.all([
+      queryDB(THEME_DB, { sorts: [{ property: '番号', direction: 'ascending' }] }),
+      queryDB(TASK_DB),
+    ]);
+
+    // タスクをテーマ値でグルーピング
+    const tasksByTheme = {};
+    for (const task of tasksRes.results) {
+      const key = getSelect(task, 'テーマ');
+      if (!tasksByTheme[key]) tasksByTheme[key] = [];
+      tasksByTheme[key].push(task);
+    }
+
+    // テーマカードを描画
+    container.innerHTML = themesRes.results
+      .map((theme, idx) => buildThemeCard(theme, idx, tasksByTheme))
+      .join('');
+
+    // 進捗を初期表示
+    document.querySelectorAll('.action-list').forEach(list => updateProgress(list));
+
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = `
+      <div class="error-msg">
+        データの取得に失敗しました。<br>
+        <small style="opacity:0.75;">${esc(e.message)}</small><br>
+        <button onclick="init()">再試行</button>
+      </div>`;
+  }
+}
+
+init();
 </script>
 </body>
 </html>
