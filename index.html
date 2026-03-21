@@ -154,7 +154,6 @@ body {
   display: flex; align-items: flex-start; gap: 8px;
   background: var(--surface2); border-radius: var(--radius);
   padding: 7px 10px; cursor: pointer; transition: background 0.15s;
-  position: relative;
 }
 .action-item:hover { background: var(--border); }
 .action-item.done { opacity: 0.45; }
@@ -166,41 +165,29 @@ body {
   flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
   justify-content: center; transition: all 0.15s;
 }
-.action-item.done .action-check {
-  background: var(--accent); border-color: var(--accent);
-}
-.action-item.done .action-check::after {
-  content: '✓'; color: white; font-size: 10px; font-weight: 600;
-}
+.action-item.done .action-check { background: var(--accent); border-color: var(--accent); }
+.action-item.done .action-check::after { content: '✓'; color: white; font-size: 10px; font-weight: 600; }
+
 .action-num {
   font-size: 10px; font-weight: 500; color: var(--text3);
-  font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px;
-  min-width: 16px;
+  font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px; min-width: 16px;
 }
 .action-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
 .action-status {
-  font-size: 9px; padding: 1px 6px; border-radius: 99px;
-  font-weight: 500; border: 1px solid; align-self: center; flex-shrink: 0;
+  font-size: 9px; padding: 1px 6px; border-radius: 99px; font-weight: 500;
+  border: 1px solid; align-self: center; flex-shrink: 0;
   background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border);
 }
 
 /* ── Memo ── */
-.memo-area {
-  margin-top: 0.875rem;
-  padding-top: 0.875rem;
-  border-top: 1px solid var(--border);
-}
-.memo-label {
-  font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace;
-  letter-spacing: 0.08em; margin-bottom: 5px;
-}
+.memo-area { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--border); }
+.memo-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; margin-bottom: 5px; }
 .memo-input {
   width: 100%; min-height: 56px; resize: vertical;
   border: 1px solid var(--border); border-radius: var(--radius);
   background: var(--surface2); color: var(--text);
   font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
-  padding: 8px 10px; outline: none; transition: border 0.15s;
-  line-height: 1.55;
+  padding: 8px 10px; outline: none; transition: border 0.15s; line-height: 1.55;
 }
 .memo-input:focus { border-color: var(--border2); background: var(--surface); }
 .memo-input::placeholder { color: var(--text3); }
@@ -233,8 +220,7 @@ body {
 .btn-reset {
   font-size: 11px; color: var(--text3); background: none;
   border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 3px 10px; cursor: pointer; font-family: 'DM Mono', monospace;
-  margin-top: 4px;
+  padding: 3px 10px; cursor: pointer; font-family: 'DM Mono', monospace; margin-top: 4px;
 }
 .btn-reset:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
 
@@ -248,34 +234,23 @@ body {
 /* ── Responsive (mobile) ── */
 @media (max-width: 480px) {
   .page { padding: 1rem 0.75rem 3rem; }
-
   .site-header { margin-bottom: 1.25rem; }
   .site-name { font-size: 17px; }
   .updated { font-size: 10px; }
-
-  .metrics {
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 8px; margin-bottom: 1.25rem;
-  }
+  .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 1.25rem; }
   .met { padding: 0.625rem 0.75rem; }
   .met-value { font-size: 18px; }
   .met-sub { font-size: 9px; }
-
   .section-heading { margin-top: 1.25rem; }
-
   .card-header { padding: 0.75rem 0.875rem; gap: 8px; }
   .card-body { padding: 0.75rem 0.875rem 0.875rem; }
   .card-title { font-size: 13px; }
   .badge { font-size: 9px; padding: 2px 6px; }
-
   .card-cols { grid-template-columns: 1fr; gap: 0.875rem; }
-
   .confirmed-list li { font-size: 12px; }
   .action-text { font-size: 12px; }
   .action-item { padding: 6px 8px; }
-
   .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
-
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
@@ -329,7 +304,7 @@ body {
     </div>
   </div>
 
-  <!-- Finance detail -->
+  <!-- Finance -->
   <div class="section-heading">FINANCIAL — 借入残高明細（令和8年3月現在）</div>
   <div class="card">
     <div class="card-header" onclick="toggleCard(this)">
@@ -343,12 +318,7 @@ body {
         <table class="loan-table">
           <thead>
             <tr>
-              <th>借入先・用途</th>
-              <th>貸付額</th>
-              <th>現残高</th>
-              <th>年間返済</th>
-              <th>利率</th>
-              <th>完済</th>
+              <th>借入先・用途</th><th>貸付額</th><th>現残高</th><th>年間返済</th><th>利率</th><th>完済</th>
             </tr>
           </thead>
           <tbody>
@@ -371,7 +341,7 @@ body {
   <div class="section-heading">THEMES — テーマ別進捗</div>
   <div class="themes">
 
-    <!-- ① 資金調達 -->
+    <!-- ① 融資・資金調達戦略 | テーマDB番号:1 | タスクDB テーマ:資金調達 -->
     <div class="card t1" id="card-1">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">①</div>
@@ -426,7 +396,7 @@ body {
       </div>
     </div>
 
-    <!-- ② 補助金申請 -->
+    <!-- ② スマ転・補助申請準備 | テーマDB番号:2 | タスクDB テーマ:補助金申請 -->
     <div class="card t2" id="card-2">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">②</div>
@@ -476,7 +446,7 @@ body {
       </div>
     </div>
 
-    <!-- ③ 輸出 -->
+    <!-- ③ 輸出市場開拓（香港・台湾）| テーマDB番号:3 | タスクDB テーマ:輸出 -->
     <div class="card t3" id="card-3">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">③</div>
@@ -519,7 +489,7 @@ body {
       </div>
     </div>
 
-    <!-- ④ 加工・販売 -->
+    <!-- ④ 米加工ライン整備 | テーマDB番号:4 | タスクDB テーマ:加工・販売 -->
     <div class="card t4" id="card-4">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">④</div>
@@ -562,7 +532,7 @@ body {
       </div>
     </div>
 
-    <!-- ⑤ 経営基盤 -->
+    <!-- ⑤ 税理士変更・法人化 | テーマDB番号:5 | タスクDB テーマ:経営基盤 -->
     <div class="card t5" id="card-5">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">⑤</div>
@@ -604,7 +574,7 @@ body {
       </div>
     </div>
 
-    <!-- ⑥ 設備投資 -->
+    <!-- ⑥ 設備投資・施設整備 | タスクDB テーマ:設備投資（テーマDB未登録） -->
     <div class="card t6" id="card-6">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">⑥</div>
@@ -664,16 +634,16 @@ function getState() {
 function setState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
 // 更新日
-document.getElementById('updated-date').textContent = '更新日: ' + new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
+document.getElementById('updated-date').textContent =
+  '更新日: ' + new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
 
 // カード開閉
 function toggleCard(header) {
   const card = header.closest('.card');
   card.classList.toggle('open');
   const s = getState();
-  const id = card.id;
   if (!s.open) s.open = {};
-  s.open[id] = card.classList.contains('open');
+  s.open[card.id] = card.classList.contains('open');
   setState(s);
 }
 
@@ -699,7 +669,7 @@ function saveMemo(el) {
 // 進捗表示
 function updateProgress(themeId) {
   const items = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item`);
-  const done = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item.done`);
+  const done  = document.querySelectorAll(`.action-list[data-theme="${themeId}"] .action-item.done`);
   const el = document.getElementById('prog-' + themeId);
   if (el && items.length) el.textContent = done.length + '/' + items.length;
 }
@@ -718,7 +688,6 @@ function resetAll() {
 (function init() {
   const s = getState();
 
-  // カード開閉状態
   if (s.open) {
     Object.entries(s.open).forEach(([id, isOpen]) => {
       const card = document.getElementById(id);
@@ -726,7 +695,6 @@ function resetAll() {
     });
   }
 
-  // アクション状態
   if (s.actions) {
     Object.entries(s.actions).forEach(([key, isDone]) => {
       const el = document.querySelector(`[data-key="${key}"]`);
@@ -734,7 +702,6 @@ function resetAll() {
     });
   }
 
-  // メモ復元
   if (s.memos) {
     Object.entries(s.memos).forEach(([key, val]) => {
       const el = document.querySelector(`.memo-input[data-key="${key}"]`);
@@ -742,7 +709,6 @@ function resetAll() {
     });
   }
 
-  // 進捗表示
   [1,2,3,4,5,6].forEach(i => updateProgress(i));
 })();
 </script>
