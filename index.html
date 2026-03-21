@@ -112,7 +112,7 @@ body {
 
 .badge {
   font-size: 10px; padding: 2px 8px; border-radius: 99px;
-  font-weight: 500; border: 1px solid;
+  font-weight: 500; border: 1px solid; white-space: nowrap;
 }
 .badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
 .badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
@@ -178,6 +178,11 @@ body {
   min-width: 16px;
 }
 .action-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
+.action-status {
+  font-size: 9px; padding: 1px 6px; border-radius: 99px;
+  font-weight: 500; border: 1px solid; align-self: center; flex-shrink: 0;
+  background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border);
+}
 
 /* ── Memo ── */
 .memo-area {
@@ -200,20 +205,8 @@ body {
 .memo-input:focus { border-color: var(--border2); background: var(--surface); }
 .memo-input::placeholder { color: var(--text3); }
 
-/* ── Finance summary ── */
-.finance-grid {
-  display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 8px; margin-bottom: 1rem;
-}
-.fin-cell {
-  background: var(--surface2); border-radius: var(--radius);
-  padding: 0.625rem 0.75rem;
-}
-.fin-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
-.fin-value { font-size: 16px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); }
-.fin-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
-
 /* ── Loan table ── */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .loan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .loan-table th {
   font-size: 10px; font-weight: 500; color: var(--text3);
@@ -223,7 +216,7 @@ body {
 .loan-table th:first-child { text-align: left; }
 .loan-table td {
   padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border);
-  color: var(--text); font-family: 'DM Mono', monospace;
+  color: var(--text); font-family: 'DM Mono', monospace; white-space: nowrap;
 }
 .loan-table td:first-child { text-align: left; font-family: 'Noto Sans JP', sans-serif; color: var(--text2); }
 .loan-table tr:last-child td { border-bottom: none; font-weight: 600; color: var(--text); }
@@ -252,19 +245,14 @@ body {
   display: flex; justify-content: space-between; align-items: center;
 }
 
-/* ── Table scroll wrapper ── */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
 /* ── Responsive (mobile) ── */
 @media (max-width: 480px) {
   .page { padding: 1rem 0.75rem 3rem; }
 
-  /* Header */
   .site-header { margin-bottom: 1.25rem; }
   .site-name { font-size: 17px; }
   .updated { font-size: 10px; }
 
-  /* Metrics: 2列グリッド */
   .metrics {
     grid-template-columns: repeat(2, minmax(0,1fr));
     gap: 8px; margin-bottom: 1.25rem;
@@ -273,27 +261,21 @@ body {
   .met-value { font-size: 18px; }
   .met-sub { font-size: 9px; }
 
-  /* Section heading */
   .section-heading { margin-top: 1.25rem; }
 
-  /* Card */
   .card-header { padding: 0.75rem 0.875rem; gap: 8px; }
   .card-body { padding: 0.75rem 0.875rem 0.875rem; }
   .card-title { font-size: 13px; }
   .badge { font-size: 9px; padding: 2px 6px; }
 
-  /* Card内2列 → 1列スタック */
   .card-cols { grid-template-columns: 1fr; gap: 0.875rem; }
 
-  /* テキストサイズ */
   .confirmed-list li { font-size: 12px; }
   .action-text { font-size: 12px; }
   .action-item { padding: 6px 8px; }
 
-  /* Memo */
   .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
 
-  /* Footer */
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
@@ -358,25 +340,25 @@ body {
     </div>
     <div class="card-body">
       <div class="table-wrap">
-      <table class="loan-table">
-        <thead>
-          <tr>
-            <th>借入先・用途</th>
-            <th>貸付額</th>
-            <th>現残高</th>
-            <th>年間返済</th>
-            <th>利率</th>
-            <th>完済</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>公庫① 乾燥機等</td><td>420万</td><td>360万</td><td>60万</td><td>0.00%</td><td>R13</td></tr>
-          <tr><td>公庫② トラクター・倉庫</td><td>1,390万</td><td>1,390万</td><td>100万</td><td>0.00%</td><td>R21</td></tr>
-          <tr><td>公庫③ コンバイン</td><td>280万</td><td>280万</td><td>40万</td><td>0.60%</td><td>R15</td></tr>
-          <tr><td>JA 管理・播種・除草</td><td>561万</td><td>504万</td><td>56万</td><td>0.20%</td><td>R16</td></tr>
-          <tr><td>合計（前島除く）</td><td>2,651万</td><td>2,534万</td><td>256万</td><td>—</td><td>—</td></tr>
-        </tbody>
-      </table>
+        <table class="loan-table">
+          <thead>
+            <tr>
+              <th>借入先・用途</th>
+              <th>貸付額</th>
+              <th>現残高</th>
+              <th>年間返済</th>
+              <th>利率</th>
+              <th>完済</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>公庫① 乾燥機等</td><td>420万</td><td>360万</td><td>60万</td><td>0.00%</td><td>R13</td></tr>
+            <tr><td>公庫② トラクター・倉庫</td><td>1,390万</td><td>1,390万</td><td>100万</td><td>0.00%</td><td>R21</td></tr>
+            <tr><td>公庫③ コンバイン</td><td>280万</td><td>280万</td><td>40万</td><td>0.60%</td><td>R15</td></tr>
+            <tr><td>JA 管理・播種・除草</td><td>561万</td><td>504万</td><td>56万</td><td>0.20%</td><td>R16</td></tr>
+            <tr><td>合計（前島除く）</td><td>2,651万</td><td>2,534万</td><td>256万</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
       </div>
       <div class="memo-area">
         <div class="memo-label">MEMO</div>
@@ -389,7 +371,7 @@ body {
   <div class="section-heading">THEMES — テーマ別進捗</div>
   <div class="themes">
 
-    <!-- ① 融資 -->
+    <!-- ① 資金調達 -->
     <div class="card t1" id="card-1">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">①</div>
@@ -421,7 +403,8 @@ body {
               <div class="action-item" onclick="toggleAction(this)" data-key="1-2">
                 <div class="action-check"></div>
                 <span class="action-num">02</span>
-                <span class="action-text">年次キャッシュフロー表（5〜10年）を作成</span>
+                <span class="action-text">日本政策金融公庫への訪問</span>
+                <span class="action-status">進行中</span>
               </div>
               <div class="action-item" onclick="toggleAction(this)" data-key="1-3">
                 <div class="action-check"></div>
@@ -431,8 +414,7 @@ body {
               <div class="action-item" onclick="toggleAction(this)" data-key="1-4">
                 <div class="action-check"></div>
                 <span class="action-num">04</span>
-                <span class="action-text">日本政策金融公庫への訪問</span>
-                <span class="badge badge-blue" style="font-size:9px;padding:1px 6px;align-self:center;flex-shrink:0;">進行中</span>
+                <span class="action-text">年次キャッシュフロー表（5〜10年）を作成</span>
               </div>
             </div>
           </div>
@@ -444,7 +426,7 @@ body {
       </div>
     </div>
 
-    <!-- ② スマ転 -->
+    <!-- ② 補助金申請 -->
     <div class="card t2" id="card-2">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">②</div>
@@ -472,7 +454,7 @@ body {
                 <div class="action-check"></div>
                 <span class="action-num">01</span>
                 <span class="action-text">中国四国農政局へ生産方式革新実施計画の事前相談</span>
-                <span class="badge badge-blue" style="font-size:9px;padding:1px 6px;align-self:center;flex-shrink:0;">進行中</span>
+                <span class="action-status">進行中</span>
               </div>
               <div class="action-item" onclick="toggleAction(this)" data-key="2-2">
                 <div class="action-check"></div>
@@ -537,7 +519,7 @@ body {
       </div>
     </div>
 
-    <!-- ④ 加工 -->
+    <!-- ④ 加工・販売 -->
     <div class="card t4" id="card-4">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">④</div>
@@ -580,7 +562,7 @@ body {
       </div>
     </div>
 
-    <!-- ⑤ 税理士・法人化 -->
+    <!-- ⑤ 経営基盤 -->
     <div class="card t5" id="card-5">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-num">⑤</div>
@@ -622,7 +604,6 @@ body {
       </div>
     </div>
 
-
     <!-- ⑥ 設備投資 -->
     <div class="card t6" id="card-6">
       <div class="card-header" onclick="toggleCard(this)">
@@ -638,7 +619,7 @@ body {
             <div class="col-label">CONFIRMED — 確定事項</div>
             <ul class="confirmed-list">
               <li>倉庫・ライスセンター建設予定（農業改良資金4,500万円充当）</li>
-              <li>精米ライン整備（スマ転補助申請と連携）</li>
+              <li>精米ライン整備（スマ転補助申請と連携予定）</li>
             </ul>
           </div>
           <div>
