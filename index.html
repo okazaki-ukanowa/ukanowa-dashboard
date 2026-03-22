@@ -126,6 +126,14 @@ body {
 .action-item:hover { background: var(--border); }
 .action-item.done { opacity: 0.45; }
 .action-item.done .action-text { text-decoration: line-through; }
+/* 優先度スタイル（doneより低い優先度で適用） */
+.action-item.priority-high { border-left: 3px solid var(--red-border); background: #FDF5F5; }
+.action-item.priority-high:hover { background: #F9ECEC; }
+.action-item.priority-low { opacity: 0.65; }
+.action-item.priority-low:hover { opacity: 0.8; }
+/* done は優先度より優先 */
+.action-item.done.priority-high { border-left: 3px solid var(--border2); background: var(--surface2); }
+.action-item.done.priority-low { opacity: 0.45; }
 .action-check {
   width: 16px; height: 16px; border-radius: 4px;
   border: 1.5px solid var(--border2); background: var(--surface);
@@ -613,8 +621,11 @@ function buildThemeCard(theme, idx, tasksByTheme) {
         const status     = getStatus(task, 'ステータス');
         const isDone     = status === '完了';
         const isProgress = status === '進行中';
+        const priority   = getSelect(task, '優先度');
+        const priCls     = priority.includes('🔴') ? ' priority-high'
+                         : priority.includes('🟢') ? ' priority-low' : '';
         return `
-        <div class="action-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
+        <div class="action-item${isDone ? ' done' : ''}${priCls}" data-page-id="${task.id}">
           <div class="action-check" onclick="toggleTask(this)"></div>
           <span class="action-num">${String(i + 1).padStart(2, '0')}</span>
           <span class="action-text">${esc(getTitle(task, '名前'))}</span>
