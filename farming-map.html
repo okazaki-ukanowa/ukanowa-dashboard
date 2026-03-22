@@ -179,11 +179,12 @@ body {
     </div>
   </div>
   <div class="btn-group">
-    <button class="btn" id="btnToggleFude" onclick="toggleFudePolygons()">筆ポリゴンを表示</button>
-    <label class="btn" style="margin:0">
-      GeoJSON読込
+    <label class="btn btn-primary" style="margin:0;cursor:pointer">
+      筆ポリゴン読込（GeoJSON）
       <input type="file" id="geojsonInput" accept=".geojson,.json" style="display:none" onchange="loadGeoJSON(event)">
     </label>
+    <button class="btn" id="btnToggleFude" onclick="toggleFudePolygons()" style="display:none">筆ポリゴンを非表示</button>
+    <button class="btn" id="btnFudeHelp" onclick="showFudeHelp()">筆ポリゴンの取得方法</button>
     <button class="btn" id="btnPanel" onclick="togglePanel()">圃場一覧</button>
   </div>
 </div>
@@ -219,6 +220,27 @@ body {
   </div>
 </div>
 
+<!-- Fude Help Dialog -->
+<div class="dialog-overlay" id="fudeHelpDialog">
+  <div class="dialog" style="max-width:440px">
+    <h3>筆ポリゴンの取得方法</h3>
+    <div style="font-size:13px; line-height:1.8; color:var(--text2)">
+      <p style="margin-bottom:8px">農林水産省の筆ポリゴンデータ（GeoJSON）をダウンロードして読み込みます。</p>
+      <ol style="padding-left:1.2em; margin-bottom:12px">
+        <li><a href="https://open.fude.maff.go.jp" target="_blank" rel="noopener" style="color:var(--accent)">筆ポリゴンデータダウンロード</a>にアクセス</li>
+        <li>都道府県「愛媛県」→ 市区町村「松山市」を選択</li>
+        <li>GeoJSON形式でダウンロード</li>
+        <li>本ページの「筆ポリゴン読込（GeoJSON）」ボタンでファイルを選択</li>
+      </ol>
+      <p style="font-size:11px; color:var(--text3)">※ファイルサイズが大きい場合、読み込みに数秒かかることがあります</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn" onclick="closeFudeHelp()">閉じる</button>
+      <a href="https://open.fude.maff.go.jp" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none">ダウンロードサイトへ</a>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -242,14 +264,12 @@ const FARM_COLORS = [
 // ─── State ───
 let map;
 let fudeLayer = null;       // GeoJSON layer (手動読込用)
-let fudeTiles = null;       // WMSタイルレイヤー
 let fudeVisible = false;
 let farmLayers = {};        // notionPageId -> L.polygon
 let farmData = [];          // array of farm objects from Notion
 let pendingGeometry = null;
 let selectedColor = FARM_COLORS[0];
 let memoTimers = {};
-const FUDE_MIN_ZOOM = 14;
 
 // ─── Map Init ───
 function initMap() {
@@ -261,65 +281,59 @@ function initMap() {
     maxZoom: 18
   }).addTo(map);
 
-  // WMS筆ポリゴンタイルを準備（まだ追加しない）
-  fudeTiles = L.tileLayer.wms(
-    'https://hojo.maff.go.jp/geoserver/fude/ows', {
-      layers: 'fude:fude',
-      format: 'image/png',
-      transparent: true,
-      opacity: 0.5,
-      attribution: '© 農林水産省',
-      minZoom: FUDE_MIN_ZOOM,
-      maxZoom: 18
-    }
-  );
-
-  // ズームレベル監視
-  map.on('zoomend', onZoomChange);
-
   loadFarmsFromNotion();
 }
 
 // ─── Notion API helpers ───
-async function notionQuery(dbId, filter = {}) {
-  const res = await fetch(`${WORKER_URL}/api/notion`, {
+// Worker は Notion API をプロキシ: /databases/{id}/query, /pages, /pages/{id}
+async function notionQuery(dbId, body = {}) {
+  const url = `${WORKER_URL}/databases/${dbId}/query`;
+  console.log('[Notion] query:', url);
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'query',
-      database_id: dbId,
-      ...filter
-    })
+    body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error(`Notion query failed: ${res.status}`);
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    console.error(`[Notion] query failed (${res.status}):`, err);
+    throw new Error(`Notion query failed: ${res.status} - ${err}`);
+  }
   return res.json();
 }
 
 async function notionCreate(dbId, properties) {
-  const res = await fetch(`${WORKER_URL}/api/notion`, {
+  const url = `${WORKER_URL}/pages`;
+  console.log('[Notion] create page in DB:', dbId);
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'create',
-      database_id: dbId,
+      parent: { database_id: dbId },
       properties
     })
   });
-  if (!res.ok) throw new Error(`Notion create failed: ${res.status}`);
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    console.error(`[Notion] create failed (${res.status}):`, err);
+    throw new Error(`Notion create failed: ${res.status} - ${err}`);
+  }
   return res.json();
 }
 
 async function notionUpdate(pageId, properties) {
-  const res = await fetch(`${WORKER_URL}/api/notion`, {
-    method: 'POST',
+  const url = `${WORKER_URL}/pages/${pageId}`;
+  console.log('[Notion] update page:', pageId);
+  const res = await fetch(url, {
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'update',
-      page_id: pageId,
-      properties
-    })
+    body: JSON.stringify({ properties })
   });
-  if (!res.ok) throw new Error(`Notion update failed: ${res.status}`);
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    console.error(`[Notion] update failed (${res.status}):`, err);
+    throw new Error(`Notion update failed: ${res.status} - ${err}`);
+  }
   return res.json();
 }
 
@@ -467,68 +481,23 @@ function drawFarms() {
 function toggleFudePolygons() {
   const btn = document.getElementById('btnToggleFude');
 
-  if (fudeVisible) {
-    // 非表示にする
-    if (fudeTiles && map.hasLayer(fudeTiles)) {
-      map.removeLayer(fudeTiles);
-    }
-    if (fudeLayer && map.hasLayer(fudeLayer)) {
-      map.removeLayer(fudeLayer);
-    }
+  if (fudeVisible && fudeLayer) {
+    map.removeLayer(fudeLayer);
+    fudeLayer = null;
     fudeVisible = false;
-    btn.textContent = '筆ポリゴンを表示';
-    hideFudeZoomNotice();
+    btn.style.display = 'none';
+    showToast('筆ポリゴンを非表示にしました');
     return;
   }
-
-  // 表示にする
-  fudeVisible = true;
-  btn.textContent = '筆ポリゴンを非表示';
-
-  if (map.getZoom() >= FUDE_MIN_ZOOM) {
-    if (fudeTiles && !map.hasLayer(fudeTiles)) {
-      fudeTiles.addTo(map);
-    }
-    showToast('筆ポリゴン（WMSタイル）を表示中');
-    hideFudeZoomNotice();
-  } else {
-    showFudeZoomNotice();
-    showToast('ズームインすると筆ポリゴンが表示されます');
-  }
 }
 
-function onZoomChange() {
-  if (!fudeVisible) return;
-  const zoom = map.getZoom();
-
-  if (zoom >= FUDE_MIN_ZOOM) {
-    if (fudeTiles && !map.hasLayer(fudeTiles)) {
-      fudeTiles.addTo(map);
-    }
-    hideFudeZoomNotice();
-  } else {
-    if (fudeTiles && map.hasLayer(fudeTiles)) {
-      map.removeLayer(fudeTiles);
-    }
-    showFudeZoomNotice();
-  }
+function showFudeHelp() {
+  const overlay = document.getElementById('fudeHelpDialog');
+  overlay.classList.add('active');
 }
 
-function showFudeZoomNotice() {
-  let notice = document.getElementById('fudeZoomNotice');
-  if (!notice) {
-    notice = document.createElement('div');
-    notice.id = 'fudeZoomNotice';
-    notice.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 16px;font-size:12px;color:var(--text2);z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
-    notice.textContent = 'ズームインすると筆ポリゴンが表示されます（zoom ' + FUDE_MIN_ZOOM + '+）';
-    document.body.appendChild(notice);
-  }
-  notice.style.display = 'block';
-}
-
-function hideFudeZoomNotice() {
-  const notice = document.getElementById('fudeZoomNotice');
-  if (notice) notice.style.display = 'none';
+function closeFudeHelp() {
+  document.getElementById('fudeHelpDialog').classList.remove('active');
 }
 
 function displayFudePolygons(geojson) {
@@ -578,12 +547,14 @@ function loadGeoJSON(event) {
       if (geojson.type === 'FeatureCollection' && geojson.features) {
         displayFudePolygons(geojson);
         fudeVisible = true;
-        document.getElementById('btnToggleFude').textContent = '筆ポリゴンを非表示';
-        showToast(`${geojson.features.length}件のポリゴンを読み込みました`);
+        const btn = document.getElementById('btnToggleFude');
+        btn.style.display = '';
+        btn.textContent = '筆ポリゴンを非表示';
+        showToast(`${geojson.features.length}件の筆ポリゴンを読み込みました`);
 
         // 読み込んだエリアにズーム
         if (fudeLayer) {
-          map.fitBounds(fudeLayer.getBounds());
+          map.fitBounds(fudeLayer.getBounds(), { padding: [30, 30] });
         }
       } else {
         showToast('有効なGeoJSONファイルではありません');
@@ -667,11 +638,6 @@ async function registerFarm() {
 
     drawFarms();
     renderFarmList();
-
-    // GeoJSON手動読込レイヤーがある場合は再描画して登録済みを除外
-    if (fudeVisible && fudeLayer) {
-      // GeoJSONレイヤーの元データから再描画（登録済みは drawFarms 側で表示）
-    }
 
     showToast(`「${name}」を登録しました`);
     pendingGeometry = null;
