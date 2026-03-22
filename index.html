@@ -214,6 +214,35 @@ body {
 }
 .error-msg button:hover { background: var(--red-bg); }
 
+/* ── Add Task ── */
+.btn-add-task {
+  display: flex; align-items: center; gap: 5px;
+  margin-top: 6px; padding: 5px 8px;
+  font-size: 12px; color: var(--text3); font-family: 'Noto Sans JP', sans-serif;
+  background: none; border: 1px dashed var(--border2); border-radius: var(--radius);
+  cursor: pointer; width: 100%; transition: all 0.15s;
+}
+.btn-add-task:hover { color: var(--accent); border-color: var(--accent); background: var(--green-bg); }
+.btn-add-task-icon { font-size: 14px; line-height: 1; }
+.add-task-form { display: none; margin-top: 6px; }
+.add-task-form.open { display: flex; gap: 6px; }
+.add-task-input {
+  flex: 1; padding: 6px 10px; font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); outline: none;
+  transition: border 0.15s;
+}
+.add-task-input:focus { border-color: var(--accent); }
+.add-task-submit {
+  padding: 6px 12px; font-size: 12px; font-family: 'DM Mono', monospace;
+  background: var(--accent); color: white; border: none;
+  border-radius: var(--radius); cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.add-task-submit:hover { opacity: 0.85; }
+.add-task-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* ── Reset button ── */
 .btn-reset {
   font-size: 11px; color: var(--text3); background: none;
@@ -393,6 +422,19 @@ async function patchPage(pageId, properties) {
     body: JSON.stringify({ properties }),
   });
   if (!res.ok) throw new Error(`更新エラー: ${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+async function createPage(databaseId, properties) {
+  const res = await fetch(`${WORKER}/pages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      parent: { database_id: databaseId },
+      properties,
+    }),
+  });
+  if (!res.ok) throw new Error(`作成エラー: ${res.status} ${res.statusText}`);
   return res.json();
 }
 
@@ -599,6 +641,15 @@ function buildThemeCard(theme, idx, tasksByTheme) {
         <div>
           <div class="col-label">NEXT ACTIONS</div>
           <div class="action-list" data-theme="${num}">${tasksHTML}</div>
+          <button class="btn-add-task" onclick="showAddTask(this)">
+            <span class="btn-add-task-icon">＋</span> タスクを追加
+          </button>
+          <div class="add-task-form" data-task-key="${esc(taskKey)}" data-theme-num="${num}">
+            <input class="add-task-input" type="text" placeholder="タスク名を入力... (Enterで追加)"
+              onkeydown="if(event.key==='Enter')submitNewTask(this)"
+              onkeyup="if(event.key==='Escape')cancelAddTask(this)">
+            <button class="add-task-submit" onclick="submitNewTask(this.previousElementSibling)">追加</button>
+          </div>
         </div>
       </div>
       <div class="memo-area">
@@ -625,6 +676,70 @@ function buildThemeCard(theme, idx, tasksByTheme) {
       </div>
     </div>
   </div>`;
+}
+
+// ── タスク追加UI ────────────────────────────────────────
+function showAddTask(btn) {
+  const form = btn.nextElementSibling;
+  btn.style.display = 'none';
+  form.classList.add('open');
+  form.querySelector('.add-task-input').focus();
+}
+
+function cancelAddTask(inputOrBtn) {
+  const form = inputOrBtn.closest('.add-task-form');
+  form.classList.remove('open');
+  form.querySelector('.add-task-input').value = '';
+  form.previousElementSibling.style.display = '';
+}
+
+async function submitNewTask(input) {
+  const name = input.value.trim();
+  if (!name) return;
+
+  const form      = input.closest('.add-task-form');
+  const taskKey   = form.dataset.taskKey;
+  const themeNum  = form.dataset.themeNum;
+  const submitBtn = form.querySelector('.add-task-submit');
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '追加中...';
+
+  try {
+    const newPage = await createPage(TASK_DB, {
+      '名前':     { title: [{ text: { content: name } }] },
+      'テーマ':   { select: { name: taskKey } },
+      'ステータス': { status: { name: '未着手' } },
+    });
+
+    // リストに楽観的追加
+    const list = document.querySelector(`.action-list[data-theme="${themeNum}"]`);
+    const emptyMsg = list.querySelector('p');
+    if (emptyMsg) emptyMsg.remove();
+
+    const count = list.querySelectorAll('.action-item').length + 1;
+    const div = document.createElement('div');
+    div.className = 'action-item';
+    div.dataset.pageId = newPage.id;
+    div.innerHTML = `
+      <div class="action-check" onclick="toggleTask(this)"></div>
+      <span class="action-num">${String(count).padStart(2, '0')}</span>
+      <span class="action-text">${esc(name)}</span>`;
+    list.appendChild(div);
+    updateProgress(list);
+
+    // フォームをリセット
+    input.value = '';
+    cancelAddTask(input);
+    showToast(`「${name}」を追加しました`);
+
+  } catch (e) {
+    console.error('タスク作成失敗:', e);
+    showToast('タスクの作成に失敗しました');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = '追加';
+  }
 }
 
 // ── テーマ横断サマリー更新 ────────────────────────────────
