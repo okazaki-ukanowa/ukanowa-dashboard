@@ -355,8 +355,9 @@ body {
 
     <!-- Actions -->
     <div class="sb-actions">
-      <label class="btn btn-primary" style="margin:0;cursor:pointer">
-        + 筆ポリゴン読込
+      <button class="btn btn-primary" onclick="showAddFarmHint()">＋ 圃場を追加</button>
+      <label class="btn" style="margin:0;cursor:pointer">
+        筆ポリゴン読込
         <input type="file" id="geojsonInput" accept=".geojson,.json" style="display:none" onchange="loadGeoJSON(event)">
       </label>
       <button class="btn" onclick="fitAllFarms()">全体表示</button>
@@ -670,6 +671,10 @@ function toggleFudePolygons() {
     document.getElementById('btnToggleFude').style.display = 'none';
     showToast('筆ポリゴンを非表示にしました');
   }
+}
+
+function showAddFarmHint() {
+  showToast('筆ポリゴンを読み込み、地図上の区画をクリックして登録できます');
 }
 
 function showFudeHelp() {
