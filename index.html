@@ -142,12 +142,16 @@ body {
 
 /* ── Memo ── */
 .memo-area { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--border); }
-.memo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.memo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .memo-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; }
 .memo-save-indicator { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; opacity: 0; transition: opacity 0.3s; }
 .memo-save-indicator.visible { opacity: 1; }
+.memo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.memo-col-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; margin-bottom: 4px; }
+.memo-col-label.decided { color: var(--green-text); }
+.memo-col-label.considering { color: var(--amber-text); }
 .memo-input {
-  width: 100%; min-height: 56px; resize: vertical;
+  width: 100%; min-height: 52px; resize: vertical;
   border: 1px solid var(--border); border-radius: var(--radius);
   background: var(--surface2); color: var(--text);
   font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
@@ -155,6 +159,21 @@ body {
 }
 .memo-input:focus { border-color: var(--border2); background: var(--surface); }
 .memo-input::placeholder { color: var(--text3); }
+
+/* ── Theme Summary ── */
+.theme-summary {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 6px 12px; margin-bottom: 0.75rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Mono', monospace; font-size: 11px;
+}
+.sum-total { color: var(--text2); font-weight: 500; }
+.sum-sep { color: var(--border2); }
+.sum-done { color: var(--green-text); }
+.sum-progress { color: var(--amber-text); }
+.sum-r9 { color: var(--blue-text); }
+.sum-gray { color: var(--text3); }
 
 /* ── Loan table ── */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -230,6 +249,7 @@ body {
   .action-text { font-size: 12px; }
   .action-item { padding: 6px 8px; }
   .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
+  .memo-cols { grid-template-columns: 1fr; }
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
@@ -312,6 +332,7 @@ body {
 
   <!-- Themes (動的描画) -->
   <div class="section-heading">THEMES — テーマ別進捗</div>
+  <div class="theme-summary" id="theme-summary" style="display:none;"></div>
   <div class="themes" id="themes-container">
     <div class="loading">
       <div class="spinner"></div>
@@ -389,6 +410,22 @@ const getStatus = (page, key) =>
 const getNumber = (page, key) =>
   page.properties[key]?.number ?? 0;
 
+// ── メモ パース / 結合 ──────────────────────────────────
+const MEMO_MARKER = '【検討中】';
+function parseMemo(raw) {
+  const d = raw || '';
+  const idx = d.indexOf(MEMO_MARKER);
+  if (idx === -1) return { decided: d.trim(), considering: '' };
+  return {
+    decided:     d.slice(0, idx).trim(),
+    considering: d.slice(idx + MEMO_MARKER.length).trim(),
+  };
+}
+function buildMemoContent(decided, considering) {
+  if (!considering.trim()) return decided.trim();
+  return `${decided.trim()}\n${MEMO_MARKER}\n${considering.trim()}`;
+}
+
 // ── HTML エスケープ ────────────────────────────────────
 const esc = s => String(s)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -453,15 +490,18 @@ function scheduleMemoSave(textarea) {
   const notionId = textarea.dataset.notionId;
   if (!notionId) return;
 
-  // 保存中インジケータ表示
-  const indicator = textarea.closest('.memo-area')?.querySelector('.memo-save-indicator');
+  const memoArea = textarea.closest('.memo-area');
+  const indicator = memoArea?.querySelector('.memo-save-indicator');
   if (indicator) { indicator.textContent = '...'; indicator.classList.add('visible'); }
 
   clearTimeout(memoTimers[notionId]);
   memoTimers[notionId] = setTimeout(async () => {
+    const decided     = memoArea?.querySelector('.memo-decided')?.value     || '';
+    const considering = memoArea?.querySelector('.memo-considering')?.value || '';
+    const combined    = buildMemoContent(decided, considering);
     try {
       await patchPage(notionId, {
-        'メモ': { rich_text: [{ type: 'text', text: { content: textarea.value } }] },
+        'メモ': { rich_text: [{ type: 'text', text: { content: combined } }] },
       });
       if (indicator) { indicator.textContent = '保存済み ✓'; }
     } catch (e) {
@@ -566,13 +606,55 @@ function buildThemeCard(theme, idx, tasksByTheme) {
           <div class="memo-label">MEMO</div>
           <span class="memo-save-indicator"></span>
         </div>
-        <textarea class="memo-input"
-          placeholder="メモを入力..."
-          data-notion-id="${theme.id}"
-          oninput="scheduleMemoSave(this)">${esc(memo)}</textarea>
+        <div class="memo-cols">
+          <div>
+            <div class="memo-col-label decided">✅ 決定事項</div>
+            <textarea class="memo-input memo-decided"
+              placeholder="確定した内容..."
+              data-notion-id="${theme.id}"
+              oninput="scheduleMemoSave(this)">${esc(parseMemo(memo).decided)}</textarea>
+          </div>
+          <div>
+            <div class="memo-col-label considering">🟡 検討中</div>
+            <textarea class="memo-input memo-considering"
+              placeholder="検討中・未確定の内容..."
+              data-notion-id="${theme.id}"
+              oninput="scheduleMemoSave(this)">${esc(parseMemo(memo).considering)}</textarea>
+          </div>
+        </div>
       </div>
     </div>
   </div>`;
+}
+
+// ── テーマ横断サマリー更新 ────────────────────────────────
+function updateThemeSummary() {
+  const el = document.getElementById('theme-summary');
+  if (!el) return;
+  const cards = document.querySelectorAll('#themes-container .card');
+  if (!cards.length) return;
+
+  let done = 0, inProgress = 0, r9 = 0, considering = 0;
+  cards.forEach(card => {
+    const badge = card.querySelector('.card-header .badge');
+    const txt = badge?.textContent?.trim() || '';
+    if (txt === '完了')          done++;
+    else if (txt === '進行中')   inProgress++;
+    else if (txt.includes('令和9')) r9++;
+    else                          considering++;
+  });
+
+  const parts = [];
+  if (done)        parts.push(`<span class="sum-done">完了 ${done}</span>`);
+  if (inProgress)  parts.push(`<span class="sum-progress">進行中 ${inProgress}</span>`);
+  if (r9)          parts.push(`<span class="sum-r9">R9目標 ${r9}</span>`);
+  if (considering) parts.push(`<span class="sum-gray">検討中 ${considering}</span>`);
+
+  el.innerHTML =
+    `<span class="sum-total">${cards.length}テーマ</span>` +
+    `<span class="sum-sep">|</span>` +
+    parts.join('<span class="sum-sep"> · </span>');
+  el.style.display = 'flex';
 }
 
 // ── チェックリセット ───────────────────────────────────
@@ -625,6 +707,9 @@ async function init() {
 
     // 進捗を初期表示
     document.querySelectorAll('.action-list').forEach(list => updateProgress(list));
+
+    // テーマ横断サマリーを表示
+    updateThemeSummary();
 
   } catch (e) {
     console.error(e);
