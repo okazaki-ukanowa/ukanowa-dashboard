@@ -290,6 +290,25 @@ body {
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
+/* ── Focus View ── */
+.focus-empty { font-size: 12px; color: var(--text3); padding: 8px 4px; font-family: 'DM Mono', monospace; }
+.focus-grid { display: flex; flex-direction: column; gap: 5px; }
+.focus-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 12px;
+  transition: background 0.15s;
+}
+.focus-item:hover { background: var(--surface2); }
+.focus-item.done { opacity: 0.45; }
+.focus-item.done .focus-text { text-decoration: line-through; }
+.focus-theme-tag {
+  font-size: 10px; padding: 2px 7px; border-radius: 99px;
+  font-weight: 500; border: 1px solid; white-space: nowrap; flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+.focus-text { font-size: 13px; color: var(--text); flex: 1; line-height: 1.5; }
+
 /* ── Print ── */
 @media print {
   body { background: white; font-size: 12px; }
@@ -337,6 +356,22 @@ body {
       <div class="met-label">経営面積</div>
       <div class="met-value">12→30ha</div>
       <div class="met-sub">拡大進行中（8年目）</div>
+    </div>
+  </div>
+
+  <!-- Focus View (動的) -->
+  <div class="section-heading">FOCUS — 進行中タスク</div>
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)" style="cursor:pointer;">
+      <div class="card-num" style="background:#FFF3CD;color:#8A5C00;">▶</div>
+      <span class="card-title">今週のフォーカス</span>
+      <span class="badge badge-amber" id="focus-badge">読み込み中...</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div id="focus-container">
+        <div class="loading"><div class="spinner"></div><span>タスクを取得中...</span></div>
+      </div>
     </div>
   </div>
 
@@ -579,6 +614,55 @@ function showToast(msg) {
   t.style.opacity = '1';
   clearTimeout(t._timer);
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// ── フォーカスビュー構築 ───────────────────────────
+function buildFocusView(tasksByTheme, themesRes) {
+  const container = document.getElementById('focus-container');
+  if (!container) return;
+  // テーマ番号→テーマ名のマップを作成
+  const themeNumMap = {};
+  for (const theme of themesRes.results) {
+    const num  = getNumber(theme, '番号');
+    const name = getTitle(theme, 'テーマ名');
+    themeNumMap[name] = num;
+  }
+  // 全テーマから「進行中」タスクを収集
+  const inProgressTasks = [];
+  for (const [themeKey, tasks] of Object.entries(tasksByTheme)) {
+    for (const task of tasks) {
+      if (getStatus(task, 'ステータス') === '進行中') {
+        inProgressTasks.push({ task, themeKey });
+      }
+    }
+  }
+  // バッジ更新
+  const badge = document.getElementById('focus-badge');
+  if (badge) badge.textContent = inProgressTasks.length ? `${inProgressTasks.length}件` : '0件';
+  if (!inProgressTasks.length) {
+    container.innerHTML = '<p class="focus-empty">✓ 現在「進行中」のタスクはありません</p>';
+    return;
+  }
+  // テーマ別カラー（THEME_TASK_MAPの逆引き）
+  const TASK_THEME_COLORS = {
+    '資金調達':   { bg: '#E8F4E8', text: '#2D6A2D', border: '#A8D4A8' },
+    '補助金申請': { bg: '#E8F0FC', text: '#1A4A9A', border: '#A8C0F0' },
+    '輸出':       { bg: '#FDF3E0', text: '#8A5C00', border: '#F0CC80' },
+    '加工・販売': { bg: '#F0E8FC', text: '#5A1A9A', border: '#C8A8F0' },
+    '経営基盤':   { bg: '#FCE8F0', text: '#9A1A50', border: '#F0A8C8' },
+    '設備投資':   { bg: '#E8F5F5', text: '#1A6A6A', border: '#A8D8D8' },
+  };
+  const html = inProgressTasks.map(({ task, themeKey }) => {
+    const isDone = getStatus(task, 'ステータス') === '完了';
+    const color  = TASK_THEME_COLORS[themeKey] || { bg: '#F0EDE6', text: '#6B6560', border: '#CCC8C0' };
+    return `
+    <div class="focus-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
+      <div class="action-check" onclick="toggleTask(this)"></div>
+      <span class="focus-theme-tag" style="background:${color.bg};color:${color.text};border-color:${color.border};">${esc(themeKey)}</span>
+      <span class="focus-text">${esc(getTitle(task, '名前'))}</span>
+    </div>`;
+  }).join('');
+  container.innerHTML = `<div class="focus-grid">${html}</div>`;
 }
 
 // ── テーマカード HTML 生成 ─────────────────────────────
@@ -825,6 +909,9 @@ async function init() {
       if (!tasksByTheme[key]) tasksByTheme[key] = [];
       tasksByTheme[key].push(task);
     }
+
+    // フォーカスビューを描画
+    buildFocusView(tasksByTheme, themesRes);
 
     // テーマカードを描画
     container.innerHTML = themesRes.results
