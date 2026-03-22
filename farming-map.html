@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>うかのわ 営農マップ</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --border: #E2DDD5;
+  --border2: #CCC8C0;
+  --text: #1A1816;
+  --text2: #6B6560;
+  --text3: #9B958E;
+  --green-bg: #E8F4E8;
+  --green-text: #2D6A2D;
+  --green-border: #A8D4A8;
+  --amber-bg: #FDF3E0;
+  --amber-text: #8A5C00;
+  --amber-border: #F0CC80;
+  --accent: #2D6A2D;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Header ── */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 1000;
+}
+.top-bar-left { display: flex; align-items: center; gap: 12px; }
+.top-bar-title { font-size: 15px; font-weight: 600; }
+.top-bar-sub { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.btn {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  padding: 6px 14px; background: var(--surface); color: var(--text2);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.btn:hover { background: var(--surface2); }
+.btn-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.btn-primary:hover { background: #245a24; }
+.btn-group { display: flex; gap: 8px; align-items: center; }
+
+/* ── Map ── */
+#map { width: 100%; height: calc(100vh - 52px); }
+
+/* ── Side Panel ── */
+.side-panel {
+  position: fixed; top: 52px; right: 0; width: 360px;
+  height: calc(100vh - 52px);
+  background: var(--surface); border-left: 1px solid var(--border);
+  z-index: 1000; overflow-y: auto;
+  transform: translateX(100%); transition: transform 0.25s ease;
+}
+.side-panel.open { transform: translateX(0); }
+.panel-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.panel-header h3 { font-size: 14px; font-weight: 600; }
+.panel-close {
+  background: none; border: none; font-size: 20px;
+  cursor: pointer; color: var(--text3); line-height: 1;
+}
+.panel-body { padding: 1rem; }
+
+/* ── Farm Card ── */
+.farm-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1rem;
+  margin-bottom: 0.75rem; cursor: pointer; transition: border-color 0.15s;
+}
+.farm-card:hover { border-color: var(--accent); }
+.farm-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.farm-card-name { font-weight: 600; font-size: 14px; }
+.farm-card-color {
+  width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1);
+}
+.farm-card-meta { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.farm-card-memo {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 6px 8px; font-size: 12px; font-family: 'Noto Sans JP', sans-serif;
+  resize: vertical; min-height: 40px; margin-top: 8px;
+  background: var(--surface2); color: var(--text);
+}
+.farm-card-memo:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+
+/* ── Mowing section ── */
+.mowing-section { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.mowing-title { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+.mowing-item {
+  display: flex; align-items: center; gap: 8px; padding: 4px 0;
+  font-size: 12px;
+}
+.mowing-item input[type="checkbox"] { accent-color: var(--accent); }
+.mowing-item.done { color: var(--text3); text-decoration: line-through; }
+
+/* ── Dialog ── */
+.dialog-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.dialog-overlay.active { opacity: 1; pointer-events: all; }
+.dialog {
+  background: var(--surface); border-radius: var(--radius-lg);
+  padding: 1.5rem; width: 90%; max-width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+.dialog h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.dialog label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+.dialog input[type="text"], .dialog textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 10px; font-size: 13px; font-family: 'Noto Sans JP', sans-serif;
+  margin-bottom: 12px;
+}
+.dialog input:focus, .dialog textarea:focus { outline: none; border-color: var(--accent); }
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+
+/* ── Color Picker ── */
+.color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.color-swatch {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; transition: border-color 0.15s;
+}
+.color-swatch.selected { border-color: var(--text); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: #fff; padding: 10px 20px;
+  border-radius: var(--radius); font-size: 13px; z-index: 3000;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ── Loading ── */
+.loading-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .side-panel { width: 100%; }
+  .top-bar { flex-wrap: wrap; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div>
+      <div class="top-bar-title">営農マップ</div>
+      <div class="top-bar-sub">うかのわ farm management</div>
+    </div>
+  </div>
+  <div class="btn-group">
+    <button class="btn" id="btnToggleFude" onclick="toggleFudePolygons()">筆ポリゴンを表示</button>
+    <label class="btn" style="margin:0">
+      GeoJSON読込
+      <input type="file" id="geojsonInput" accept=".geojson,.json" style="display:none" onchange="loadGeoJSON(event)">
+    </label>
+    <button class="btn" id="btnPanel" onclick="togglePanel()">圃場一覧</button>
+  </div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Side Panel -->
+<div class="side-panel" id="sidePanel">
+  <div class="panel-header">
+    <h3>登録圃場</h3>
+    <button class="panel-close" onclick="togglePanel()">&times;</button>
+  </div>
+  <div class="panel-body" id="farmList">
+    <div style="text-align:center; padding:2rem; color:var(--text3);">読み込み中...</div>
+  </div>
+</div>
+
+<!-- Register Dialog -->
+<div class="dialog-overlay" id="registerDialog">
+  <div class="dialog">
+    <h3>圃場を登録</h3>
+    <label>圃場名</label>
+    <input type="text" id="farmName" placeholder="例: 田んぼA">
+    <label>色</label>
+    <div class="color-picker" id="colorPicker"></div>
+    <label>注意事項・メモ</label>
+    <textarea id="farmNote" rows="3" placeholder="水路が近い、など"></textarea>
+    <div class="dialog-actions">
+      <button class="btn" onclick="closeRegisterDialog()">キャンセル</button>
+      <button class="btn btn-primary" onclick="registerFarm()">登録</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ─── Config ───
+const WORKER_URL = 'https://ukanowa-api.commonground-oka.workers.dev';
+const FARM_DB_ID = '63a14967d0fa42e997ba81e2e0d0b532';
+const MOWING_DB_ID = 'ab48bde332f1468ca0ba73630c8166bc';
+
+// 久米窪田エリア（松山市）
+const DEFAULT_CENTER = [33.835, 132.815];
+const DEFAULT_ZOOM = 16;
+
+const FARM_COLORS = [
+  '#4CAF50', '#2196F3', '#FF9800', '#9C27B0',
+  '#F44336', '#00BCD4', '#8BC34A', '#FF5722',
+  '#3F51B5', '#CDDC39'
+];
+
+// ─── State ───
+let map;
+let fudeLayer = null;
+let fudeVisible = false;
+let farmLayers = {};      // notionPageId -> L.polygon
+let farmData = [];        // array of farm objects from Notion
+let pendingGeometry = null;
+let selectedColor = FARM_COLORS[0];
+let memoTimers = {};
+
+// ─── Map Init ───
+function initMap() {
+  map = L.map('map', { zoomControl: true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+
+  // 国土地理院 衛星写真
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg', {
+    attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',
+    maxZoom: 18
+  }).addTo(map);
+
+  loadFarmsFromNotion();
+}
+
+// ─── Notion API helpers ───
+async function notionQuery(dbId, filter = {}) {
+  const res = await fetch(`${WORKER_URL}/api/notion`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'query',
+      database_id: dbId,
+      ...filter
+    })
+  });
+  if (!res.ok) throw new Error(`Notion query failed: ${res.status}`);
+  return res.json();
+}
+
+async function notionCreate(dbId, properties) {
+  const res = await fetch(`${WORKER_URL}/api/notion`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'create',
+      database_id: dbId,
+      properties
+    })
+  });
+  if (!res.ok) throw new Error(`Notion create failed: ${res.status}`);
+  return res.json();
+}
+
+async function notionUpdate(pageId, properties) {
+  const res = await fetch(`${WORKER_URL}/api/notion`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'update',
+      page_id: pageId,
+      properties
+    })
+  });
+  if (!res.ok) throw new Error(`Notion update failed: ${res.status}`);
+  return res.json();
+}
+
+// ─── Load Farms from Notion ───
+async function loadFarmsFromNotion() {
+  try {
+    const data = await notionQuery(FARM_DB_ID);
+    farmData = [];
+    const results = data.results || [];
+
+    for (const page of results) {
+      const props = page.properties || {};
+      const farm = {
+        id: page.id,
+        name: extractText(props['圃場名'] || props['Name'] || props['名前']),
+        color: extractText(props['色'] || props['Color']),
+        note: extractText(props['注意事項'] || props['メモ'] || props['Notes']),
+        geometry: null,
+        mowingPoints: []
+      };
+
+      // 座標JSONを取得
+      const coordProp = props['座標JSON'] || props['座標'] || props['Coordinates'];
+      if (coordProp) {
+        const coordText = extractText(coordProp);
+        if (coordText) {
+          try {
+            farm.geometry = JSON.parse(coordText);
+          } catch (e) {
+            console.warn('座標JSONパース失敗:', farm.name, e);
+          }
+        }
+      }
+
+      if (farm.geometry) {
+        farmData.push(farm);
+      }
+    }
+
+    // 草刈りポイントを取得
+    await loadMowingPoints();
+
+    drawFarms();
+    renderFarmList();
+    showToast(`${farmData.length}件の圃場を読み込みました`);
+  } catch (e) {
+    console.error('圃場読み込みエラー:', e);
+    showToast('圃場データの読み込みに失敗しました');
+    renderFarmList();
+  }
+}
+
+async function loadMowingPoints() {
+  try {
+    const data = await notionQuery(MOWING_DB_ID);
+    const results = data.results || [];
+
+    for (const page of results) {
+      const props = page.properties || {};
+      const farmRel = props['圃場'] || props['Farm'];
+      const farmIds = extractRelation(farmRel);
+      const point = {
+        id: page.id,
+        name: extractText(props['名前'] || props['Name'] || props['ポイント名']),
+        done: extractCheckbox(props['完了'] || props['Done'] || props['ステータス']),
+        farmId: farmIds[0] || null
+      };
+
+      if (point.farmId) {
+        const farm = farmData.find(f => f.id === point.farmId);
+        if (farm) {
+          farm.mowingPoints.push(point);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('草刈りポイント読み込みエラー:', e);
+  }
+}
+
+// ─── Notion property extractors ───
+function extractText(prop) {
+  if (!prop) return '';
+  if (prop.title) return prop.title.map(t => t.plain_text || '').join('');
+  if (prop.rich_text) return prop.rich_text.map(t => t.plain_text || '').join('');
+  if (prop.select) return prop.select?.name || '';
+  if (prop.number !== undefined) return String(prop.number);
+  return '';
+}
+
+function extractRelation(prop) {
+  if (!prop || !prop.relation) return [];
+  return prop.relation.map(r => r.id);
+}
+
+function extractCheckbox(prop) {
+  if (!prop) return false;
+  if (prop.checkbox !== undefined) return prop.checkbox;
+  if (prop.select) return prop.select?.name === '完了';
+  return false;
+}
+
+// ─── Draw Farms on Map ───
+function drawFarms() {
+  // 既存レイヤークリア
+  Object.values(farmLayers).forEach(layer => map.removeLayer(layer));
+  farmLayers = {};
+
+  for (const farm of farmData) {
+    if (!farm.geometry) continue;
+
+    let coords;
+    if (farm.geometry.type === 'Polygon') {
+      coords = farm.geometry.coordinates[0].map(c => [c[1], c[0]]);
+    } else if (Array.isArray(farm.geometry[0])) {
+      coords = farm.geometry.map(c => Array.isArray(c[0]) ? [c[0][1], c[0][0]] : [c[1], c[0]]);
+    } else {
+      coords = farm.geometry;
+    }
+
+    const color = farm.color || FARM_COLORS[0];
+    const polygon = L.polygon(coords, {
+      color: color,
+      fillColor: color,
+      fillOpacity: 0.35,
+      weight: 2
+    }).addTo(map);
+
+    polygon.bindTooltip(farm.name, {
+      permanent: false,
+      direction: 'center',
+      className: 'farm-tooltip'
+    });
+
+    polygon.on('click', () => {
+      openPanel();
+      scrollToFarm(farm.id);
+    });
+
+    farmLayers[farm.id] = polygon;
+  }
+}
+
+// ─── Fude Polygon (筆ポリゴン) ───
+async function toggleFudePolygons() {
+  const btn = document.getElementById('btnToggleFude');
+
+  if (fudeVisible && fudeLayer) {
+    map.removeLayer(fudeLayer);
+    fudeLayer = null;
+    fudeVisible = false;
+    btn.textContent = '筆ポリゴンを表示';
+    return;
+  }
+
+  btn.innerHTML = '<span class="loading-spinner"></span> 取得中...';
+  btn.disabled = true;
+
+  try {
+    const bounds = map.getBounds();
+    const geojson = await fetchFudePolygons(bounds);
+    if (geojson && geojson.features && geojson.features.length > 0) {
+      displayFudePolygons(geojson);
+      fudeVisible = true;
+      btn.textContent = '筆ポリゴンを非表示';
+      showToast(`${geojson.features.length}件の筆ポリゴンを表示`);
+    } else {
+      showToast('この範囲に筆ポリゴンが見つかりません。GeoJSON読込をお試しください。');
+      btn.textContent = '筆ポリゴンを表示';
+    }
+  } catch (e) {
+    console.error('筆ポリゴン取得エラー:', e);
+    showToast('筆ポリゴン取得に失敗。GeoJSON読込をお試しください。');
+    btn.textContent = '筆ポリゴンを表示';
+  }
+
+  btn.disabled = false;
+}
+
+async function fetchFudePolygons(bounds) {
+  // 農水省 筆ポリゴンAPI WFS
+  const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+  const url = `https://mff.maff.go.jp/api/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=fude&outputFormat=application/json&bbox=${bbox},EPSG:4326&count=2000`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`WFS API error: ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.warn('農水省APIアクセス失敗、代替方法を試行:', e);
+    // APIが使えない場合はnullを返してGeoJSON手動読込に誘導
+    return null;
+  }
+}
+
+function displayFudePolygons(geojson) {
+  if (fudeLayer) {
+    map.removeLayer(fudeLayer);
+  }
+
+  // 登録済み圃場の座標と照合して除外
+  const registeredGeometries = farmData
+    .filter(f => f.geometry)
+    .map(f => JSON.stringify(f.geometry));
+
+  fudeLayer = L.geoJSON(geojson, {
+    filter: (feature) => {
+      // 登録済みの筆は表示しない
+      const geomStr = JSON.stringify(feature.geometry);
+      return !registeredGeometries.includes(geomStr);
+    },
+    style: {
+      color: '#999',
+      fillColor: '#ccc',
+      fillOpacity: 0.25,
+      weight: 1.5
+    },
+    onEachFeature: (feature, layer) => {
+      layer.on('click', () => {
+        onFudeClick(feature, layer);
+      });
+      // ホバーでハイライト
+      layer.on('mouseover', () => {
+        layer.setStyle({ fillOpacity: 0.5, color: '#666', weight: 2 });
+      });
+      layer.on('mouseout', () => {
+        layer.setStyle({ fillOpacity: 0.25, color: '#999', weight: 1.5 });
+      });
+    }
+  }).addTo(map);
+}
+
+// ─── GeoJSON Manual Load ───
+function loadGeoJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const geojson = JSON.parse(e.target.result);
+      if (geojson.type === 'FeatureCollection' && geojson.features) {
+        displayFudePolygons(geojson);
+        fudeVisible = true;
+        document.getElementById('btnToggleFude').textContent = '筆ポリゴンを非表示';
+        showToast(`${geojson.features.length}件のポリゴンを読み込みました`);
+
+        // 読み込んだエリアにズーム
+        if (fudeLayer) {
+          map.fitBounds(fudeLayer.getBounds());
+        }
+      } else {
+        showToast('有効なGeoJSONファイルではありません');
+      }
+    } catch (err) {
+      showToast('ファイルの読み込みに失敗しました');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ─── Farm Registration ───
+function onFudeClick(feature, layer) {
+  pendingGeometry = feature.geometry;
+  selectedColor = FARM_COLORS[Math.floor(Math.random() * FARM_COLORS.length)];
+  document.getElementById('farmName').value = '';
+  document.getElementById('farmNote').value = '';
+  renderColorPicker();
+  document.getElementById('registerDialog').classList.add('active');
+}
+
+function renderColorPicker() {
+  const picker = document.getElementById('colorPicker');
+  picker.innerHTML = FARM_COLORS.map(c =>
+    `<div class="color-swatch ${c === selectedColor ? 'selected' : ''}"
+          style="background:${c}"
+          onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectColor(color) {
+  selectedColor = color;
+  renderColorPicker();
+}
+
+function closeRegisterDialog() {
+  document.getElementById('registerDialog').classList.remove('active');
+  pendingGeometry = null;
+}
+
+async function registerFarm() {
+  const name = document.getElementById('farmName').value.trim();
+  if (!name) {
+    showToast('圃場名を入力してください');
+    return;
+  }
+  if (!pendingGeometry) {
+    showToast('ポリゴンが選択されていません');
+    return;
+  }
+
+  const note = document.getElementById('farmNote').value.trim();
+  const geometryJson = JSON.stringify(pendingGeometry);
+
+  closeRegisterDialog();
+  showToast('登録中...');
+
+  try {
+    const properties = {
+      '圃場名': { title: [{ text: { content: name } }] },
+      '色': { rich_text: [{ text: { content: selectedColor } }] },
+      '座標JSON': { rich_text: [{ text: { content: geometryJson } }] }
+    };
+    if (note) {
+      properties['注意事項'] = { rich_text: [{ text: { content: note } }] };
+    }
+
+    const result = await notionCreate(FARM_DB_ID, properties);
+
+    const newFarm = {
+      id: result.id,
+      name: name,
+      color: selectedColor,
+      note: note,
+      geometry: pendingGeometry,
+      mowingPoints: []
+    };
+    farmData.push(newFarm);
+
+    drawFarms();
+    renderFarmList();
+
+    // 筆ポリゴン表示を更新（登録済みを除外）
+    if (fudeVisible && fudeLayer) {
+      const bounds = map.getBounds();
+      try {
+        const geojson = await fetchFudePolygons(bounds);
+        if (geojson) displayFudePolygons(geojson);
+      } catch (e) {
+        // 静かに失敗
+      }
+    }
+
+    showToast(`「${name}」を登録しました`);
+    pendingGeometry = null;
+  } catch (e) {
+    console.error('圃場登録エラー:', e);
+    showToast('登録に失敗しました');
+  }
+}
+
+// ─── Farm List Panel ───
+function togglePanel() {
+  document.getElementById('sidePanel').classList.toggle('open');
+}
+
+function openPanel() {
+  document.getElementById('sidePanel').classList.add('open');
+}
+
+function scrollToFarm(farmId) {
+  const el = document.getElementById(`farm-${farmId}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.style.borderColor = 'var(--accent)';
+    setTimeout(() => { el.style.borderColor = ''; }, 2000);
+  }
+}
+
+function renderFarmList() {
+  const container = document.getElementById('farmList');
+  if (farmData.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text3);">圃場が登録されていません<br><small>筆ポリゴンをクリックして登録</small></div>';
+    return;
+  }
+
+  container.innerHTML = farmData.map(farm => {
+    const mowingHtml = farm.mowingPoints.length > 0
+      ? `<div class="mowing-section">
+           <div class="mowing-title">草刈りポイント</div>
+           ${farm.mowingPoints.map(mp => `
+             <div class="mowing-item ${mp.done ? 'done' : ''}">
+               <input type="checkbox" ${mp.done ? 'checked' : ''}
+                      onchange="toggleMowing('${mp.id}', this.checked)">
+               <span>${escapeHtml(mp.name)}</span>
+             </div>
+           `).join('')}
+         </div>`
+      : '';
+
+    return `
+      <div class="farm-card" id="farm-${farm.id}" onclick="flyToFarm('${farm.id}')">
+        <div class="farm-card-header">
+          <span class="farm-card-name">${escapeHtml(farm.name)}</span>
+          <div class="farm-card-color" style="background:${farm.color || FARM_COLORS[0]}"></div>
+        </div>
+        <textarea class="farm-card-memo"
+                  placeholder="メモを入力..."
+                  onclick="event.stopPropagation()"
+                  oninput="debounceMemo('${farm.id}', this.value)">${escapeHtml(farm.note || '')}</textarea>
+        ${mowingHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+function flyToFarm(farmId) {
+  const layer = farmLayers[farmId];
+  if (layer) {
+    map.fitBounds(layer.getBounds(), { padding: [50, 50] });
+  }
+}
+
+// ─── Mowing Checkbox ───
+async function toggleMowing(pointId, done) {
+  try {
+    await notionUpdate(pointId, {
+      '完了': { checkbox: done }
+    });
+
+    // ローカルの状態も更新
+    for (const farm of farmData) {
+      const mp = farm.mowingPoints.find(p => p.id === pointId);
+      if (mp) {
+        mp.done = done;
+        break;
+      }
+    }
+    renderFarmList();
+  } catch (e) {
+    console.error('草刈りステータス更新エラー:', e);
+    showToast('ステータス更新に失敗しました');
+  }
+}
+
+// ─── Memo Debounce ───
+function debounceMemo(farmId, value) {
+  if (memoTimers[farmId]) clearTimeout(memoTimers[farmId]);
+  memoTimers[farmId] = setTimeout(() => {
+    saveMemo(farmId, value);
+  }, 1000);
+}
+
+async function saveMemo(farmId, value) {
+  const farm = farmData.find(f => f.id === farmId);
+  if (!farm) return;
+  farm.note = value;
+
+  try {
+    await notionUpdate(farmId, {
+      '注意事項': { rich_text: [{ text: { content: value } }] }
+    });
+  } catch (e) {
+    console.error('メモ保存エラー:', e);
+    showToast('メモの保存に失敗しました');
+  }
+}
+
+// ─── Utilities ───
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ─── Init ───
+document.addEventListener('DOMContentLoaded', initMap);
+</script>
+</body>
+</html>
