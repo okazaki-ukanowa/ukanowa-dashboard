@@ -241,13 +241,15 @@ const FARM_COLORS = [
 
 // ─── State ───
 let map;
-let fudeLayer = null;
+let fudeLayer = null;       // GeoJSON layer (手動読込用)
+let fudeTiles = null;       // WMSタイルレイヤー
 let fudeVisible = false;
-let farmLayers = {};      // notionPageId -> L.polygon
-let farmData = [];        // array of farm objects from Notion
+let farmLayers = {};        // notionPageId -> L.polygon
+let farmData = [];          // array of farm objects from Notion
 let pendingGeometry = null;
 let selectedColor = FARM_COLORS[0];
 let memoTimers = {};
+const FUDE_MIN_ZOOM = 14;
 
 // ─── Map Init ───
 function initMap() {
@@ -258,6 +260,22 @@ function initMap() {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',
     maxZoom: 18
   }).addTo(map);
+
+  // WMS筆ポリゴンタイルを準備（まだ追加しない）
+  fudeTiles = L.tileLayer.wms(
+    'https://hojo.maff.go.jp/geoserver/fude/ows', {
+      layers: 'fude:fude',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.5,
+      attribution: '© 農林水産省',
+      minZoom: FUDE_MIN_ZOOM,
+      maxZoom: 18
+    }
+  );
+
+  // ズームレベル監視
+  map.on('zoomend', onZoomChange);
 
   loadFarmsFromNotion();
 }
@@ -446,55 +464,71 @@ function drawFarms() {
 }
 
 // ─── Fude Polygon (筆ポリゴン) ───
-async function toggleFudePolygons() {
+function toggleFudePolygons() {
   const btn = document.getElementById('btnToggleFude');
 
-  if (fudeVisible && fudeLayer) {
-    map.removeLayer(fudeLayer);
-    fudeLayer = null;
+  if (fudeVisible) {
+    // 非表示にする
+    if (fudeTiles && map.hasLayer(fudeTiles)) {
+      map.removeLayer(fudeTiles);
+    }
+    if (fudeLayer && map.hasLayer(fudeLayer)) {
+      map.removeLayer(fudeLayer);
+    }
     fudeVisible = false;
     btn.textContent = '筆ポリゴンを表示';
+    hideFudeZoomNotice();
     return;
   }
 
-  btn.innerHTML = '<span class="loading-spinner"></span> 取得中...';
-  btn.disabled = true;
+  // 表示にする
+  fudeVisible = true;
+  btn.textContent = '筆ポリゴンを非表示';
 
-  try {
-    const bounds = map.getBounds();
-    const geojson = await fetchFudePolygons(bounds);
-    if (geojson && geojson.features && geojson.features.length > 0) {
-      displayFudePolygons(geojson);
-      fudeVisible = true;
-      btn.textContent = '筆ポリゴンを非表示';
-      showToast(`${geojson.features.length}件の筆ポリゴンを表示`);
-    } else {
-      showToast('この範囲に筆ポリゴンが見つかりません。GeoJSON読込をお試しください。');
-      btn.textContent = '筆ポリゴンを表示';
+  if (map.getZoom() >= FUDE_MIN_ZOOM) {
+    if (fudeTiles && !map.hasLayer(fudeTiles)) {
+      fudeTiles.addTo(map);
     }
-  } catch (e) {
-    console.error('筆ポリゴン取得エラー:', e);
-    showToast('筆ポリゴン取得に失敗。GeoJSON読込をお試しください。');
-    btn.textContent = '筆ポリゴンを表示';
+    showToast('筆ポリゴン（WMSタイル）を表示中');
+    hideFudeZoomNotice();
+  } else {
+    showFudeZoomNotice();
+    showToast('ズームインすると筆ポリゴンが表示されます');
   }
-
-  btn.disabled = false;
 }
 
-async function fetchFudePolygons(bounds) {
-  // 農水省 筆ポリゴンAPI WFS
-  const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
-  const url = `https://mff.maff.go.jp/api/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=fude&outputFormat=application/json&bbox=${bbox},EPSG:4326&count=2000`;
+function onZoomChange() {
+  if (!fudeVisible) return;
+  const zoom = map.getZoom();
 
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`WFS API error: ${res.status}`);
-    return await res.json();
-  } catch (e) {
-    console.warn('農水省APIアクセス失敗、代替方法を試行:', e);
-    // APIが使えない場合はnullを返してGeoJSON手動読込に誘導
-    return null;
+  if (zoom >= FUDE_MIN_ZOOM) {
+    if (fudeTiles && !map.hasLayer(fudeTiles)) {
+      fudeTiles.addTo(map);
+    }
+    hideFudeZoomNotice();
+  } else {
+    if (fudeTiles && map.hasLayer(fudeTiles)) {
+      map.removeLayer(fudeTiles);
+    }
+    showFudeZoomNotice();
   }
+}
+
+function showFudeZoomNotice() {
+  let notice = document.getElementById('fudeZoomNotice');
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'fudeZoomNotice';
+    notice.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 16px;font-size:12px;color:var(--text2);z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
+    notice.textContent = 'ズームインすると筆ポリゴンが表示されます（zoom ' + FUDE_MIN_ZOOM + '+）';
+    document.body.appendChild(notice);
+  }
+  notice.style.display = 'block';
+}
+
+function hideFudeZoomNotice() {
+  const notice = document.getElementById('fudeZoomNotice');
+  if (notice) notice.style.display = 'none';
 }
 
 function displayFudePolygons(geojson) {
@@ -509,7 +543,6 @@ function displayFudePolygons(geojson) {
 
   fudeLayer = L.geoJSON(geojson, {
     filter: (feature) => {
-      // 登録済みの筆は表示しない
       const geomStr = JSON.stringify(feature.geometry);
       return !registeredGeometries.includes(geomStr);
     },
@@ -523,7 +556,6 @@ function displayFudePolygons(geojson) {
       layer.on('click', () => {
         onFudeClick(feature, layer);
       });
-      // ホバーでハイライト
       layer.on('mouseover', () => {
         layer.setStyle({ fillOpacity: 0.5, color: '#666', weight: 2 });
       });
@@ -636,15 +668,9 @@ async function registerFarm() {
     drawFarms();
     renderFarmList();
 
-    // 筆ポリゴン表示を更新（登録済みを除外）
+    // GeoJSON手動読込レイヤーがある場合は再描画して登録済みを除外
     if (fudeVisible && fudeLayer) {
-      const bounds = map.getBounds();
-      try {
-        const geojson = await fetchFudePolygons(bounds);
-        if (geojson) displayFudePolygons(geojson);
-      } catch (e) {
-        // 静かに失敗
-      }
+      // GeoJSONレイヤーの元データから再描画（登録済みは drawFarms 側で表示）
     }
 
     showToast(`「${name}」を登録しました`);
