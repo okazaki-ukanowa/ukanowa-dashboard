@@ -259,6 +259,50 @@ body {
 }
 .btn-reset:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
 
+/* ── Chat logs ── */
+.chat-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.75rem;
+}
+.filter-btn {
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  padding: 4px 10px; border-radius: 99px;
+  border: 1px solid var(--border2); background: var(--surface); color: var(--text2);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.filter-btn:hover { background: var(--surface2); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.chat-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 12px;
+  margin-bottom: 5px; transition: background 0.15s;
+}
+.chat-item:hover { background: var(--surface2); }
+.chat-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-next { font-size: 11px; color: var(--text3); flex-shrink: 0; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.pj-badge {
+  font-size: 9px; padding: 2px 7px; border-radius: 99px;
+  font-weight: 500; border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text2);
+  font-family: 'DM Mono', monospace; white-space: nowrap;
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.status-dot.active { background: var(--green-text); }
+.status-dot.paused { background: var(--amber-text); }
+.status-dot.done { background: var(--text3); }
+.chat-date { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+.btn-load-more {
+  display: block; width: 100%; padding: 8px; margin-top: 6px;
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius); color: var(--text2); cursor: pointer;
+  transition: background 0.15s; text-align: center;
+}
+.btn-load-more:hover { background: var(--surface2); }
+
 /* ── Footer ── */
 .footer {
   margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);
@@ -288,6 +332,9 @@ body {
   .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
   .memo-cols { grid-template-columns: 1fr; }
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .chat-next { display: none; }
+  .chat-filter-bar { gap: 4px; }
+  .filter-btn { font-size: 10px; padding: 3px 8px; }
 }
 
 /* ── Focus View ── */
@@ -412,6 +459,23 @@ body {
     </div>
   </div>
 
+  <!-- Chat Logs -->
+  <div class="section-heading">CHAT LOGS — チャット活動タイムライン</div>
+  <div class="chat-filter-bar" id="chat-filter-bar">
+    <button class="filter-btn active" onclick="filterChats('all')">すべて</button>
+    <button class="filter-btn" onclick="filterChats('資金調達')">資金調達</button>
+    <button class="filter-btn" onclick="filterChats('補助金申請')">補助金申請</button>
+    <button class="filter-btn" onclick="filterChats('輸出')">輸出</button>
+    <button class="filter-btn" onclick="filterChats('加工・販売')">加工・販売</button>
+    <button class="filter-btn" onclick="filterChats('経営基盤')">経営基盤</button>
+    <button class="filter-btn" onclick="filterChats('設備投資')">設備投資</button>
+    <button class="filter-btn" onclick="filterChats('ダッシュボード')">ダッシュボード</button>
+    <button class="filter-btn" onclick="filterChats('その他')">その他</button>
+  </div>
+  <div id="chat-container">
+    <div class="loading"><div class="spinner"></div><span>チャットログを取得中...</span></div>
+  </div>
+
   <!-- Footer -->
   <div class="footer">
     <span>うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411</span>
@@ -425,6 +489,7 @@ body {
 const WORKER    = 'https://ukanowa-api.commonground-oka.workers.dev';
 const THEME_DB  = '51e310b0f1114e11856b9eac6703f04a';
 const TASK_DB   = '32843c0d-960c-80dc-a210-c0b3b7e60ee7';
+const CHAT_DB   = 'db10b6592e2e4b9f8cc17cb4467b4e7e';
 
 // テーマDB テーマ名 → タスクDB テーマ値 対応表
 const THEME_TASK_MAP = {
@@ -888,6 +953,91 @@ async function resetAll() {
   showToast('リセット完了');
 }
 
+// ── チャットログ ────────────────────────────────────────
+let allChats = [];
+let chatFilter = 'all';
+let chatDisplayCount = 15;
+
+async function loadChatLogs() {
+  const container = document.getElementById('chat-container');
+  try {
+    const res = await queryDB(CHAT_DB, {
+      sorts: [{ property: '最終更新日', direction: 'descending' }],
+    });
+    allChats = res.results || [];
+    chatFilter = 'all';
+    chatDisplayCount = 15;
+    renderChats();
+  } catch (e) {
+    console.error('チャットログ取得エラー:', e);
+    container.innerHTML = `
+      <div class="error-msg">
+        チャットログの取得に失敗しました。<br>
+        <small style="opacity:0.75;">${esc(e.message)}</small><br>
+        <button onclick="loadChatLogs()">再試行</button>
+      </div>`;
+  }
+}
+
+function filterChats(filter) {
+  chatFilter = filter;
+  chatDisplayCount = 15;
+  // ボタンのアクティブ状態を更新
+  document.querySelectorAll('#chat-filter-bar .filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (filter === 'all' ? 'すべて' : filter));
+  });
+  renderChats();
+}
+
+function getFilteredChats() {
+  if (chatFilter === 'all') return allChats;
+  return allChats.filter(chat => {
+    const pj = getSelect(chat, 'PJ') || getSelect(chat, 'プロジェクト') || '';
+    return pj === chatFilter;
+  });
+}
+
+function renderChats() {
+  const container = document.getElementById('chat-container');
+  const filtered = getFilteredChats();
+  if (!filtered.length) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text3);padding:8px 4px;font-family:\'DM Mono\',monospace;">該当するチャットログはありません</p>';
+    return;
+  }
+  const visible = filtered.slice(0, chatDisplayCount);
+  const html = visible.map(chat => buildChatItem(chat)).join('');
+  const remaining = filtered.length - chatDisplayCount;
+  const moreBtn = remaining > 0
+    ? `<button class="btn-load-more" onclick="chatDisplayCount+=15;renderChats();">さらに${Math.min(remaining, 15)}件を表示（残り${remaining}件）</button>`
+    : '';
+  container.innerHTML = html + moreBtn;
+}
+
+function buildChatItem(chat) {
+  const name = getTitle(chat, '名前') || getTitle(chat, 'チャット名') || '（無題）';
+  const pj = getSelect(chat, 'PJ') || getSelect(chat, 'プロジェクト') || '';
+  const status = getSelect(chat, 'ステータス') || getStatus(chat, 'ステータス') || '';
+  const nextAction = getRichText(chat, 'ネクストアクション') || getRichText(chat, '次のアクション') || '';
+  const lastDate = chat.properties['最終更新日']?.date?.start
+                || chat.last_edited_time?.slice(0, 10) || '';
+  const dateStr = lastDate ? new Date(lastDate).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
+
+  let dotClass = 'done';
+  if (status === '進行中' || status === 'アクティブ') dotClass = 'active';
+  else if (status === '保留' || status === '一時停止') dotClass = 'paused';
+
+  return `
+  <div class="chat-item">
+    <span class="status-dot ${dotClass}" title="${esc(status)}"></span>
+    <span class="chat-name">${esc(name)}</span>
+    ${nextAction ? `<span class="chat-next" title="${esc(nextAction)}">→ ${esc(nextAction)}</span>` : ''}
+    <div class="chat-meta">
+      ${pj ? `<span class="pj-badge">${esc(pj)}</span>` : ''}
+      <span class="chat-date">${dateStr}</span>
+    </div>
+  </div>`;
+}
+
 // ── メイン初期化 ────────────────────────────────────────
 async function init() {
   document.getElementById('updated-date').textContent =
@@ -923,6 +1073,9 @@ async function init() {
 
     // テーマ横断サマリーを表示
     updateThemeSummary();
+
+    // チャットログを取得
+    loadChatLogs();
 
   } catch (e) {
     console.error(e);
