@@ -126,14 +126,6 @@ body {
 .action-item:hover { background: var(--border); }
 .action-item.done { opacity: 0.45; }
 .action-item.done .action-text { text-decoration: line-through; }
-/* 優先度スタイル（doneより低い優先度で適用） */
-.action-item.priority-high { border-left: 3px solid var(--red-border); background: #FDF5F5; }
-.action-item.priority-high:hover { background: #F9ECEC; }
-.action-item.priority-low { opacity: 0.65; }
-.action-item.priority-low:hover { opacity: 0.8; }
-/* done は優先度より優先 */
-.action-item.done.priority-high { border-left: 3px solid var(--border2); background: var(--surface2); }
-.action-item.done.priority-low { opacity: 0.45; }
 .action-check {
   width: 16px; height: 16px; border-radius: 4px;
   border: 1.5px solid var(--border2); background: var(--surface);
@@ -259,50 +251,6 @@ body {
 }
 .btn-reset:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
 
-/* ── Chat logs ── */
-.chat-filter-bar {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.75rem;
-}
-.filter-btn {
-  font-size: 11px; font-family: 'DM Mono', monospace;
-  padding: 4px 10px; border-radius: 99px;
-  border: 1px solid var(--border2); background: var(--surface); color: var(--text2);
-  cursor: pointer; transition: all 0.15s; white-space: nowrap;
-}
-.filter-btn:hover { background: var(--surface2); }
-.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.chat-item {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 8px 12px;
-  margin-bottom: 5px; transition: background 0.15s;
-}
-.chat-item:hover { background: var(--surface2); }
-.chat-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chat-next { font-size: 11px; color: var(--text3); flex-shrink: 0; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chat-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.pj-badge {
-  font-size: 9px; padding: 2px 7px; border-radius: 99px;
-  font-weight: 500; border: 1px solid var(--border2);
-  background: var(--surface2); color: var(--text2);
-  font-family: 'DM Mono', monospace; white-space: nowrap;
-}
-.status-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
-.status-dot.active { background: var(--green-text); }
-.status-dot.paused { background: var(--amber-text); }
-.status-dot.done { background: var(--text3); }
-.chat-date { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; flex-shrink: 0; }
-.btn-load-more {
-  display: block; width: 100%; padding: 8px; margin-top: 6px;
-  font-size: 12px; font-family: 'DM Mono', monospace;
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: var(--radius); color: var(--text2); cursor: pointer;
-  transition: background 0.15s; text-align: center;
-}
-.btn-load-more:hover { background: var(--surface2); }
-
 /* ── Footer ── */
 .footer {
   margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);
@@ -332,29 +280,7 @@ body {
   .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
   .memo-cols { grid-template-columns: 1fr; }
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .chat-next { display: none; }
-  .chat-filter-bar { gap: 4px; }
-  .filter-btn { font-size: 10px; padding: 3px 8px; }
 }
-
-/* ── Focus View ── */
-.focus-empty { font-size: 12px; color: var(--text3); padding: 8px 4px; font-family: 'DM Mono', monospace; }
-.focus-grid { display: flex; flex-direction: column; gap: 5px; }
-.focus-item {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 8px 12px;
-  transition: background 0.15s;
-}
-.focus-item:hover { background: var(--surface2); }
-.focus-item.done { opacity: 0.45; }
-.focus-item.done .focus-text { text-decoration: line-through; }
-.focus-theme-tag {
-  font-size: 10px; padding: 2px 7px; border-radius: 99px;
-  font-weight: 500; border: 1px solid; white-space: nowrap; flex-shrink: 0;
-  font-family: 'DM Mono', monospace;
-}
-.focus-text { font-size: 13px; color: var(--text); flex: 1; line-height: 1.5; }
 
 /* ── Print ── */
 @media print {
@@ -406,22 +332,6 @@ body {
     </div>
   </div>
 
-  <!-- Focus View (動的) -->
-  <div class="section-heading">FOCUS — 進行中タスク</div>
-  <div class="card">
-    <div class="card-header" onclick="toggleCard(this)" style="cursor:pointer;">
-      <div class="card-num" style="background:#FFF3CD;color:#8A5C00;">▶</div>
-      <span class="card-title">今週のフォーカス</span>
-      <span class="badge badge-amber" id="focus-badge">読み込み中...</span>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="card-body">
-      <div id="focus-container">
-        <div class="loading"><div class="spinner"></div><span>タスクを取得中...</span></div>
-      </div>
-    </div>
-  </div>
-
   <!-- Finance (static) -->
   <div class="section-heading">FINANCIAL — 借入残高明細（令和8年3月現在）</div>
   <div class="card">
@@ -459,23 +369,6 @@ body {
     </div>
   </div>
 
-  <!-- Chat Logs -->
-  <div class="section-heading">CHAT LOGS — チャット活動タイムライン</div>
-  <div class="chat-filter-bar" id="chat-filter-bar">
-    <button class="filter-btn active" onclick="filterChats('all')">すべて</button>
-    <button class="filter-btn" onclick="filterChats('資金調達')">資金調達</button>
-    <button class="filter-btn" onclick="filterChats('補助金申請')">補助金申請</button>
-    <button class="filter-btn" onclick="filterChats('輸出')">輸出</button>
-    <button class="filter-btn" onclick="filterChats('加工・販売')">加工・販売</button>
-    <button class="filter-btn" onclick="filterChats('経営基盤')">経営基盤</button>
-    <button class="filter-btn" onclick="filterChats('設備投資')">設備投資</button>
-    <button class="filter-btn" onclick="filterChats('ダッシュボード')">ダッシュボード</button>
-    <button class="filter-btn" onclick="filterChats('その他')">その他</button>
-  </div>
-  <div id="chat-container">
-    <div class="loading"><div class="spinner"></div><span>チャットログを取得中...</span></div>
-  </div>
-
   <!-- Footer -->
   <div class="footer">
     <span>うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411</span>
@@ -489,7 +382,6 @@ body {
 const WORKER    = 'https://ukanowa-api.commonground-oka.workers.dev';
 const THEME_DB  = '51e310b0f1114e11856b9eac6703f04a';
 const TASK_DB   = '32843c0d-960c-80dc-a210-c0b3b7e60ee7';
-const CHAT_DB   = 'db10b6592e2e4b9f8cc17cb4467b4e7e';
 
 // テーマDB テーマ名 → タスクDB テーマ値 対応表
 const THEME_TASK_MAP = {
@@ -681,55 +573,6 @@ function showToast(msg) {
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
 }
 
-// ── フォーカスビュー構築 ───────────────────────────
-function buildFocusView(tasksByTheme, themesRes) {
-  const container = document.getElementById('focus-container');
-  if (!container) return;
-  // テーマ番号→テーマ名のマップを作成
-  const themeNumMap = {};
-  for (const theme of themesRes.results) {
-    const num  = getNumber(theme, '番号');
-    const name = getTitle(theme, 'テーマ名');
-    themeNumMap[name] = num;
-  }
-  // 全テーマから「進行中」タスクを収集
-  const inProgressTasks = [];
-  for (const [themeKey, tasks] of Object.entries(tasksByTheme)) {
-    for (const task of tasks) {
-      if (getStatus(task, 'ステータス') === '進行中') {
-        inProgressTasks.push({ task, themeKey });
-      }
-    }
-  }
-  // バッジ更新
-  const badge = document.getElementById('focus-badge');
-  if (badge) badge.textContent = inProgressTasks.length ? `${inProgressTasks.length}件` : '0件';
-  if (!inProgressTasks.length) {
-    container.innerHTML = '<p class="focus-empty">✓ 現在「進行中」のタスクはありません</p>';
-    return;
-  }
-  // テーマ別カラー（THEME_TASK_MAPの逆引き）
-  const TASK_THEME_COLORS = {
-    '資金調達':   { bg: '#E8F4E8', text: '#2D6A2D', border: '#A8D4A8' },
-    '補助金申請': { bg: '#E8F0FC', text: '#1A4A9A', border: '#A8C0F0' },
-    '輸出':       { bg: '#FDF3E0', text: '#8A5C00', border: '#F0CC80' },
-    '加工・販売': { bg: '#F0E8FC', text: '#5A1A9A', border: '#C8A8F0' },
-    '経営基盤':   { bg: '#FCE8F0', text: '#9A1A50', border: '#F0A8C8' },
-    '設備投資':   { bg: '#E8F5F5', text: '#1A6A6A', border: '#A8D8D8' },
-  };
-  const html = inProgressTasks.map(({ task, themeKey }) => {
-    const isDone = getStatus(task, 'ステータス') === '完了';
-    const color  = TASK_THEME_COLORS[themeKey] || { bg: '#F0EDE6', text: '#6B6560', border: '#CCC8C0' };
-    return `
-    <div class="focus-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
-      <div class="action-check" onclick="toggleTask(this)"></div>
-      <span class="focus-theme-tag" style="background:${color.bg};color:${color.text};border-color:${color.border};">${esc(themeKey)}</span>
-      <span class="focus-text">${esc(getTitle(task, '名前'))}</span>
-    </div>`;
-  }).join('');
-  container.innerHTML = `<div class="focus-grid">${html}</div>`;
-}
-
 // ── テーマカード HTML 生成 ─────────────────────────────
 function buildThemeCard(theme, idx, tasksByTheme) {
   const num      = getNumber(theme, '番号') || (idx + 1);
@@ -770,11 +613,8 @@ function buildThemeCard(theme, idx, tasksByTheme) {
         const status     = getStatus(task, 'ステータス');
         const isDone     = status === '完了';
         const isProgress = status === '進行中';
-        const priority   = getSelect(task, '優先度');
-        const priCls     = priority.includes('🔴') ? ' priority-high'
-                         : priority.includes('🟢') ? ' priority-low' : '';
         return `
-        <div class="action-item${isDone ? ' done' : ''}${priCls}" data-page-id="${task.id}">
+        <div class="action-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
           <div class="action-check" onclick="toggleTask(this)"></div>
           <span class="action-num">${String(i + 1).padStart(2, '0')}</span>
           <span class="action-text">${esc(getTitle(task, '名前'))}</span>
@@ -953,91 +793,6 @@ async function resetAll() {
   showToast('リセット完了');
 }
 
-// ── チャットログ ────────────────────────────────────────
-let allChats = [];
-let chatFilter = 'all';
-let chatDisplayCount = 15;
-
-async function loadChatLogs() {
-  const container = document.getElementById('chat-container');
-  try {
-    const res = await queryDB(CHAT_DB, {
-      sorts: [{ property: '最終更新日', direction: 'descending' }],
-    });
-    allChats = res.results || [];
-    chatFilter = 'all';
-    chatDisplayCount = 15;
-    renderChats();
-  } catch (e) {
-    console.error('チャットログ取得エラー:', e);
-    container.innerHTML = `
-      <div class="error-msg">
-        チャットログの取得に失敗しました。<br>
-        <small style="opacity:0.75;">${esc(e.message)}</small><br>
-        <button onclick="loadChatLogs()">再試行</button>
-      </div>`;
-  }
-}
-
-function filterChats(filter) {
-  chatFilter = filter;
-  chatDisplayCount = 15;
-  // ボタンのアクティブ状態を更新
-  document.querySelectorAll('#chat-filter-bar .filter-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.trim() === (filter === 'all' ? 'すべて' : filter));
-  });
-  renderChats();
-}
-
-function getFilteredChats() {
-  if (chatFilter === 'all') return allChats;
-  return allChats.filter(chat => {
-    const pj = getSelect(chat, 'PJ') || getSelect(chat, 'プロジェクト') || '';
-    return pj === chatFilter;
-  });
-}
-
-function renderChats() {
-  const container = document.getElementById('chat-container');
-  const filtered = getFilteredChats();
-  if (!filtered.length) {
-    container.innerHTML = '<p style="font-size:12px;color:var(--text3);padding:8px 4px;font-family:\'DM Mono\',monospace;">該当するチャットログはありません</p>';
-    return;
-  }
-  const visible = filtered.slice(0, chatDisplayCount);
-  const html = visible.map(chat => buildChatItem(chat)).join('');
-  const remaining = filtered.length - chatDisplayCount;
-  const moreBtn = remaining > 0
-    ? `<button class="btn-load-more" onclick="chatDisplayCount+=15;renderChats();">さらに${Math.min(remaining, 15)}件を表示（残り${remaining}件）</button>`
-    : '';
-  container.innerHTML = html + moreBtn;
-}
-
-function buildChatItem(chat) {
-  const name = getTitle(chat, '名前') || getTitle(chat, 'チャット名') || '（無題）';
-  const pj = getSelect(chat, 'PJ') || getSelect(chat, 'プロジェクト') || '';
-  const status = getSelect(chat, 'ステータス') || getStatus(chat, 'ステータス') || '';
-  const nextAction = getRichText(chat, 'ネクストアクション') || getRichText(chat, '次のアクション') || '';
-  const lastDate = chat.properties['最終更新日']?.date?.start
-                || chat.last_edited_time?.slice(0, 10) || '';
-  const dateStr = lastDate ? new Date(lastDate).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
-
-  let dotClass = 'done';
-  if (status === '進行中' || status === 'アクティブ') dotClass = 'active';
-  else if (status === '保留' || status === '一時停止') dotClass = 'paused';
-
-  return `
-  <div class="chat-item">
-    <span class="status-dot ${dotClass}" title="${esc(status)}"></span>
-    <span class="chat-name">${esc(name)}</span>
-    ${nextAction ? `<span class="chat-next" title="${esc(nextAction)}">→ ${esc(nextAction)}</span>` : ''}
-    <div class="chat-meta">
-      ${pj ? `<span class="pj-badge">${esc(pj)}</span>` : ''}
-      <span class="chat-date">${dateStr}</span>
-    </div>
-  </div>`;
-}
-
 // ── メイン初期化 ────────────────────────────────────────
 async function init() {
   document.getElementById('updated-date').textContent =
@@ -1060,9 +815,6 @@ async function init() {
       tasksByTheme[key].push(task);
     }
 
-    // フォーカスビューを描画
-    buildFocusView(tasksByTheme, themesRes);
-
     // テーマカードを描画
     container.innerHTML = themesRes.results
       .map((theme, idx) => buildThemeCard(theme, idx, tasksByTheme))
@@ -1073,9 +825,6 @@ async function init() {
 
     // テーマ横断サマリーを表示
     updateThemeSummary();
-
-    // チャットログを取得
-    loadChatLogs();
 
   } catch (e) {
     console.error(e);
