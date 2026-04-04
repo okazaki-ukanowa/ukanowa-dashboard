@@ -27,6 +27,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .btn-print { margin-top: 6px; display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); cursor: pointer; transition: background 0.15s; }
 .btn-print:hover { background: var(--surface2); }
 .section-heading { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.75rem; margin-top: 1.75rem; }
+/* THEMES */
 .themes { display: flex; flex-direction: column; gap: 8px; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .card-header { display: flex; align-items: center; gap: 10px; padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none; }
@@ -53,6 +54,28 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
 .t5 .card-num { background: #FCE8F0; color: #9A1A50; }
 .t6 .card-num { background: #E8F5F5; color: #1A6A6A; }
+/* ACHIEVEMENT LOG */
+.log-list { display: flex; flex-direction: column; gap: 8px; }
+.log-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.log-card-header { display: flex; align-items: center; gap: 10px; padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none; }
+.log-card-header:hover { background: var(--surface2); }
+.log-card-title { font-size: 13px; font-weight: 500; flex: 1; color: var(--text); }
+.log-card.open .chevron { transform: rotate(180deg); }
+.log-card-body { display: none; border-top: 1px solid var(--border); padding: 0.75rem 1rem 1rem; }
+.log-card.open .log-card-body { display: block; }
+.log-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.log-items li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
+.log-items li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--green-border); }
+.log-note { font-size: 11px; color: var(--text3); font-style: italic; margin-bottom: 8px; }
+/* ABOUT */
+.about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+.about-sections { display: flex; flex-direction: column; gap: 1.25rem; }
+.about-section-title { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; font-weight: 600; margin-bottom: 0.4rem; }
+.about-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.about-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.about-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
+.about-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
+/* LOADING / ERROR */
 .loading { display: flex; align-items: center; gap: 12px; padding: 2rem; color: var(--text3); font-family: 'DM Mono', monospace; font-size: 12px; }
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2); border-top-color: var(--accent); animation: spin 0.7s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -68,6 +91,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   body { background: white; }
   .btn-print { display: none; }
   .card-body { display: block !important; }
+  .log-card-body { display: block !important; }
   .chevron { display: none; }
 }
 </style>
@@ -87,10 +111,17 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
   <div class="section-heading">THEMES — テーマ別進捗</div>
   <div class="themes" id="themes-container">
-    <div class="loading">
-      <div class="spinner"></div>
-      <span>Notionからデータを取得中...</span>
-    </div>
+    <div class="loading"><div class="spinner"></div><span>Notionからデータを取得中...</span></div>
+  </div>
+
+  <div class="section-heading">ACHIEVEMENT LOG — 実績ログ</div>
+  <div class="log-list" id="logs-container">
+    <div class="loading"><div class="spinner"></div><span>実績ログを取得中...</span></div>
+  </div>
+
+  <div class="section-heading">ABOUT THIS SYSTEM — このシステムについて</div>
+  <div id="about-container">
+    <div class="loading"><div class="spinner"></div><span>システム概要を取得中...</span></div>
   </div>
 
   <div class="footer">
@@ -112,59 +143,113 @@ const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
 const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-function toggleCard(header) {
-  header.closest('.card').classList.toggle('open');
+function toggleCard(el) {
+  el.closest('.card, .log-card').classList.toggle('open');
 }
 
 function buildThemeCard(theme, idx) {
-  const num       = theme['\u756A\u53F7'] || (idx + 1);
-  const name      = theme['\u30C6\u30FC\u30DE\u540D'] || '';
-  const badge     = theme['\u30B9\u30C6\u30FC\u30BF\u30B9'] || '';
-  const confirmed = theme['\u78BA\u5B9A\u4E8B\u9805'] || '';
-  const memo      = theme['\u30E1\u30E2'] || '';
+  const num       = theme['番号'] || (idx + 1);
+  const name      = theme['テーマ名'] || '';
+  const badge     = theme['ステータス'] || '';
+  const confirmed = theme['確定事項'] || '';
+  const memo      = theme['メモ'] || '';
   const colorCls  = THEME_COLOR[(num - 1) % 6];
   const numChar   = NUM_CHARS[(num - 1) % 6];
   const badgeCls  = BADGE_CLASS[badge] || 'badge-gray';
-
   const confirmedHTML = confirmed
     ? confirmed.split('\n').filter(l => l.trim()).map(l => '<li>' + esc(l.trim()) + '</li>').join('')
-    : '<li style="color:var(--text3);font-size:12px;">\uff08\u672a\u8a2d\u5b9a\uff09</li>';
-
+    : '<li style="color:var(--text3);font-size:12px;">（未設定）</li>';
   const memoHTML = memo
     ? '<p style="font-size:13px;color:var(--text2);line-height:1.6;">' + esc(memo) + '</p>'
-    : '<p style="font-size:12px;color:var(--text3);">\uff08\u306a\u3057\uff09</p>';
-
-  return '<div class="card ' + colorCls + '" id="card-' + num + '">'
+    : '<p style="font-size:12px;color:var(--text3);">（なし）</p>';
+  return '<div class="card ' + colorCls + '">'
     + '<div class="card-header" onclick="toggleCard(this)">'
     + '<div class="card-num">' + numChar + '</div>'
     + '<span class="card-title">' + esc(name) + '</span>'
     + '<span class="badge ' + badgeCls + '">' + esc(badge) + '</span>'
-    + '<span class="chevron">\u25bc</span>'
+    + '<span class="chevron">▼</span>'
     + '</div>'
-    + '<div class="card-body">'
-    + '<div class="card-cols">'
-    + '<div><div class="col-label">CONFIRMED \u2014 \u78ba\u5b9a\u4e8b\u9805</div><ul class="confirmed-list">' + confirmedHTML + '</ul></div>'
+    + '<div class="card-body"><div class="card-cols">'
+    + '<div><div class="col-label">CONFIRMED — 確定事項</div><ul class="confirmed-list">' + confirmedHTML + '</ul></div>'
     + '<div><div class="col-label">MEMO</div>' + memoHTML + '</div>'
     + '</div></div></div>';
 }
 
+function buildLogCard(section, idx) {
+  const heading = section.heading || '';
+  const items   = section.items || [];
+  if (heading.includes('更新履歴')) return '';
+  const isNote  = items.length > 0 && items[0].includes('メモリから再構成');
+  const noteHTML = isNote ? '<p class="log-note">※ ' + esc(items[0]) + '</p>' : '';
+  const listItems = isNote ? items.slice(1) : items;
+  const itemsHTML = listItems.length > 0
+    ? listItems.map(i => '<li>' + esc(i) + '</li>').join('')
+    : '<li style="color:var(--text3);font-size:12px;">（なし）</li>';
+  return '<div class="log-card">'
+    + '<div class="log-card-header" onclick="toggleCard(this)">'
+    + '<span class="log-card-title">' + esc(heading) + '</span>'
+    + '<span class="badge badge-green">完了</span>'
+    + '<span class="chevron">▼</span>'
+    + '</div>'
+    + '<div class="log-card-body">' + noteHTML + '<ul class="log-items">' + itemsHTML + '</ul></div>'
+    + '</div>';
+}
+
+function buildAbout(sections) {
+  const filtered = sections.filter(s => !s.heading.includes('更新履歴'));
+  const html = filtered.map(s => {
+    const isList = s.items.length > 1;
+    const bodyHTML = isList
+      ? '<ul class="about-list">' + s.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>'
+      : '<p class="about-body">' + esc(s.items[0] || '') + '</p>';
+    return '<div>'
+      + '<div class="about-section-title">' + esc(s.heading.toUpperCase()) + '</div>'
+      + bodyHTML
+      + '</div>';
+  }).join('');
+  return '<div class="about-card"><div class="about-sections">' + html + '</div></div>';
+}
+
 async function init() {
   document.getElementById('updated-date').textContent =
-    '\u66f4\u65b0\u65e5: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+    '更新日: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const container = document.getElementById('themes-container');
+  // THEMES
+  const themesEl = document.getElementById('themes-container');
   try {
     const res = await fetch(WORKER + '/themes?pj=' + encodeURIComponent(PJ));
-    if (!res.ok) throw new Error('\u53d6\u5f97\u30a8\u30e9\u30fc: ' + res.status);
+    if (!res.ok) throw new Error('取得エラー: ' + res.status);
     const data = await res.json();
-
     if (!data.themes || data.themes.length === 0) {
-      container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">\u30c6\u30fc\u30de\u304c\u307e\u3060\u767b\u9332\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002</p>';
-      return;
+      themesEl.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">テーマがまだ登録されていません。</p>';
+    } else {
+      themesEl.innerHTML = data.themes.map((t, i) => buildThemeCard(t, i)).join('');
     }
-    container.innerHTML = data.themes.map((theme, idx) => buildThemeCard(theme, idx)).join('');
   } catch (e) {
-    container.innerHTML = '<div class="error-msg">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002<br><small style="opacity:0.75;">' + esc(e.message) + '</small><br><button onclick="init()">\u518d\u8a66\u884c</button></div>';
+    themesEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small><br><button onclick="init()">再試行</button></div>';
+  }
+
+  // LOGS
+  const logsEl = document.getElementById('logs-container');
+  try {
+    const res = await fetch(WORKER + '/logs?type=logs');
+    if (!res.ok) throw new Error('取得エラー: ' + res.status);
+    const data = await res.json();
+    const cards = (data.sections || []).map((s, i) => buildLogCard(s, i)).filter(Boolean).join('');
+    logsEl.innerHTML = cards || '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">実績ログがありません。</p>';
+  } catch (e) {
+    logsEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small></div>';
+  }
+
+  // ABOUT
+  const aboutEl = document.getElementById('about-container');
+  try {
+    const res = await fetch(WORKER + '/logs?type=about');
+    if (!res.ok) throw new Error('取得エラー: ' + res.status);
+    const data = await res.json();
+    aboutEl.innerHTML = buildAbout(data.sections || []);
+  } catch (e) {
+    aboutEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small></div>';
   }
 }
 
