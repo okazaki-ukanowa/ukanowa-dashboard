@@ -24,8 +24,10 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .site-name { font-size: 20px; font-weight: 600; color: var(--text); }
 .header-right { text-align: right; }
 .updated { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
-.btn-print { margin-top: 6px; display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); cursor: pointer; transition: background 0.15s; }
+.btn-print { display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); cursor: pointer; transition: background 0.15s; }
 .btn-print:hover { background: var(--surface2); }
+.btn-top { display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); text-decoration: none; transition: background 0.15s; }
+.btn-top:hover { background: var(--surface2); }
 .section-heading { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.75rem; margin-top: 1.75rem; }
 /* THEMES */
 .themes { display: flex; flex-direction: column; gap: 8px; }
@@ -90,6 +92,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 @media print {
   body { background: white; }
   .btn-print { display: none; }
+  .btn-top { display: none; }
   .card-body { display: block !important; }
   .log-card-body { display: block !important; }
   .chevron { display: none; }
@@ -105,7 +108,10 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </div>
     <div class="header-right">
       <div class="updated" id="updated-date">更新日: —</div>
-      <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
+      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;">
+        <a href="top.html" class="btn-top">← トップへ</a>
+        <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
+      </div>
     </div>
   </div>
 
@@ -179,8 +185,8 @@ function buildLogCard(section, idx) {
   const heading = section.heading || '';
   const items   = section.items || [];
   if (heading.includes('更新履歴')) return '';
-  const isNote  = items.length > 0 && items[0].includes('メモリから再構成');
-  const noteHTML = isNote ? '<p class="log-note">※ ' + esc(items[0]) + '</p>' : '';
+  const isNote    = items.length > 0 && items[0].includes('メモリから再構成');
+  const noteHTML  = isNote ? '<p class="log-note">※ ' + esc(items[0]) + '</p>' : '';
   const listItems = isNote ? items.slice(1) : items;
   const itemsHTML = listItems.length > 0
     ? listItems.map(i => '<li>' + esc(i) + '</li>').join('')
@@ -198,7 +204,7 @@ function buildLogCard(section, idx) {
 function buildAbout(sections) {
   const filtered = sections.filter(s => !s.heading.includes('更新履歴'));
   const html = filtered.map(s => {
-    const isList = s.items.length > 1;
+    const isList   = s.items.length > 1;
     const bodyHTML = isList
       ? '<ul class="about-list">' + s.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>'
       : '<p class="about-body">' + esc(s.items[0] || '') + '</p>';
@@ -214,7 +220,6 @@ async function init() {
   document.getElementById('updated-date').textContent =
     '更新日: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // THEMES
   const themesEl = document.getElementById('themes-container');
   try {
     const res = await fetch(WORKER + '/themes?pj=' + encodeURIComponent(PJ));
@@ -229,7 +234,6 @@ async function init() {
     themesEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small><br><button onclick="init()">再試行</button></div>';
   }
 
-  // LOGS
   const logsEl = document.getElementById('logs-container');
   try {
     const res = await fetch(WORKER + '/logs?type=logs');
@@ -241,7 +245,6 @@ async function init() {
     logsEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small></div>';
   }
 
-  // ABOUT
   const aboutEl = document.getElementById('about-container');
   try {
     const res = await fetch(WORKER + '/logs?type=about');
