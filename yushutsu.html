@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>うかのわ 輸出ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0; --surface: #FFFFFF; --surface2: #F0EDE6;
+  --border: #E2DDD5; --border2: #CCC8C0;
+  --text: #1A1816; --text2: #6B6560; --text3: #9B958E;
+  --green-bg: #E8F4E8; --green-text: #2D6A2D; --green-border: #A8D4A8;
+  --amber-bg: #FDF3E0; --amber-text: #8A5C00; --amber-border: #F0CC80;
+  --red-bg: #FDE8E8; --red-text: #8A2020; --red-border: #F0A8A8;
+  --blue-bg: #E8F0FC; --blue-text: #1A4A9A; --blue-border: #A8C0F0;
+  --accent: #2D6A2D; --radius: 8px; --radius-lg: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+.page { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.site-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.75rem; padding-bottom: 1rem; border-bottom: 1.5px solid var(--border2); }
+.site-title { font-size: 11px; letter-spacing: 0.12em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+.site-name { font-size: 20px; font-weight: 600; color: var(--text); }
+.header-right { text-align: right; }
+.updated { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.btn-print { margin-top: 6px; display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); cursor: pointer; transition: background 0.15s; }
+.btn-print:hover { background: var(--surface2); }
+.section-heading { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.75rem; margin-top: 1.75rem; }
+.themes { display: flex; flex-direction: column; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.card-header { display: flex; align-items: center; gap: 10px; padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none; }
+.card-header:hover { background: var(--surface2); }
+.card-num { width: 26px; height: 26px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+.card-title { font-size: 14px; font-weight: 500; flex: 1; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; border: 1px solid; white-space: nowrap; }
+.badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+.badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
+.badge-blue  { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
+.badge-gray  { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
+.chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+.card.open .chevron { transform: rotate(180deg); }
+.card-body { display: none; border-top: 1px solid var(--border); padding: 0.875rem 1rem 1rem; }
+.card.open .card-body { display: block; }
+.card-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1rem; }
+.col-label { font-size: 10px; letter-spacing: 0.08em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500; }
+.confirmed-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.confirmed-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
+.confirmed-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
+.t1 .card-num { background: #E8F4E8; color: #2D6A2D; }
+.t2 .card-num { background: #E8F0FC; color: #1A4A9A; }
+.t3 .card-num { background: #FDF3E0; color: #8A5C00; }
+.t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
+.t5 .card-num { background: #FCE8F0; color: #9A1A50; }
+.t6 .card-num { background: #E8F5F5; color: #1A6A6A; }
+.loading { display: flex; align-items: center; gap: 12px; padding: 2rem; color: var(--text3); font-family: 'DM Mono', monospace; font-size: 12px; }
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2); border-top-color: var(--accent); animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-msg { padding: 1.25rem 1.5rem; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius-lg); color: var(--red-text); font-size: 13px; line-height: 1.6; }
+.error-msg button { margin-top: 0.75rem; padding: 4px 14px; font-size: 12px; font-family: 'DM Mono', monospace; background: var(--surface); border: 1px solid var(--red-border); border-radius: var(--radius); color: var(--red-text); cursor: pointer; }
+.footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; justify-content: space-between; align-items: center; }
+@media (max-width: 480px) {
+  .page { padding: 1rem 0.75rem 3rem; }
+  .site-name { font-size: 17px; }
+  .card-cols { grid-template-columns: 1fr; }
+}
+@media print {
+  body { background: white; }
+  .btn-print { display: none; }
+  .card-body { display: block !important; }
+  .chevron { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div>
+      <div class="site-title">UKANOWA / 岡崎仁志</div>
+      <div class="site-name">輸出ダッシュボード</div>
+    </div>
+    <div class="header-right">
+      <div class="updated" id="updated-date">更新日: —</div>
+      <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
+    </div>
+  </div>
+
+  <div class="section-heading">THEMES — テーマ別進捗</div>
+  <div class="themes" id="themes-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Notionからデータを取得中...</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411</span>
+  </div>
+</div>
+
+<script>
+const WORKER = 'https://ukanowa-api.commonground-oka.workers.dev';
+const PJ = '輸出';
+
+const BADGE_CLASS = {
+  '進行中': 'badge-amber',
+  '検討中': 'badge-gray',
+  '完了':   'badge-green',
+  '待機':   'badge-blue',
+};
+const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
+const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function toggleCard(header) {
+  header.closest('.card').classList.toggle('open');
+}
+
+function buildThemeCard(theme, idx) {
+  const num       = theme['\u756A\u53F7'] || (idx + 1);
+  const name      = theme['\u30C6\u30FC\u30DE\u540D'] || '';
+  const badge     = theme['\u30B9\u30C6\u30FC\u30BF\u30B9'] || '';
+  const confirmed = theme['\u78BA\u5B9A\u4E8B\u9805'] || '';
+  const memo      = theme['\u30E1\u30E2'] || '';
+  const colorCls  = THEME_COLOR[(num - 1) % 6];
+  const numChar   = NUM_CHARS[(num - 1) % 6];
+  const badgeCls  = BADGE_CLASS[badge] || 'badge-gray';
+
+  const confirmedHTML = confirmed
+    ? confirmed.split('\n').filter(l => l.trim()).map(l => '<li>' + esc(l.trim()) + '</li>').join('')
+    : '<li style="color:var(--text3);font-size:12px;">\uff08\u672a\u8a2d\u5b9a\uff09</li>';
+
+  const memoHTML = memo
+    ? '<p style="font-size:13px;color:var(--text2);line-height:1.6;">' + esc(memo) + '</p>'
+    : '<p style="font-size:12px;color:var(--text3);">\uff08\u306a\u3057\uff09</p>';
+
+  return '<div class="card ' + colorCls + '" id="card-' + num + '">'
+    + '<div class="card-header" onclick="toggleCard(this)">'
+    + '<div class="card-num">' + numChar + '</div>'
+    + '<span class="card-title">' + esc(name) + '</span>'
+    + '<span class="badge ' + badgeCls + '">' + esc(badge) + '</span>'
+    + '<span class="chevron">\u25bc</span>'
+    + '</div>'
+    + '<div class="card-body">'
+    + '<div class="card-cols">'
+    + '<div><div class="col-label">CONFIRMED \u2014 \u78ba\u5b9a\u4e8b\u9805</div><ul class="confirmed-list">' + confirmedHTML + '</ul></div>'
+    + '<div><div class="col-label">MEMO</div>' + memoHTML + '</div>'
+    + '</div></div></div>';
+}
+
+async function init() {
+  document.getElementById('updated-date').textContent =
+    '\u66f4\u65b0\u65e5: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const container = document.getElementById('themes-container');
+  try {
+    const res = await fetch(WORKER + '/themes?pj=' + encodeURIComponent(PJ));
+    if (!res.ok) throw new Error('\u53d6\u5f97\u30a8\u30e9\u30fc: ' + res.status);
+    const data = await res.json();
+
+    if (!data.themes || data.themes.length === 0) {
+      container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">\u30c6\u30fc\u30de\u304c\u307e\u3060\u767b\u9332\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002</p>';
+      return;
+    }
+    container.innerHTML = data.themes.map((theme, idx) => buildThemeCard(theme, idx)).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="error-msg">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002<br><small style="opacity:0.75;">' + esc(e.message) + '</small><br><button onclick="init()">\u518d\u8a66\u884c</button></div>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
