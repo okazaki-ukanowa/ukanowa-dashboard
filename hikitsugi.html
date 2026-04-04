@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>うかのわ 経営管理・戦略ダッシュボード</title>
+<title>うかのわ 引き継ぎ管理ダッシュボード</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -77,7 +77,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   <div class="site-header">
     <div>
       <div class="site-title">UKANOWA / 岡崎仁志</div>
-      <div class="site-name">経営管理・戦略ダッシュボード</div>
+      <div class="site-name">引き継ぎ管理ダッシュボード</div>
     </div>
     <div class="header-right">
       <div class="updated" id="updated-date">更新日: —</div>
@@ -100,14 +100,13 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 <script>
 const WORKER = 'https://ukanowa-api.commonground-oka.workers.dev';
-const PJ = '経営管理';
+const PJ = '引き継ぎ管理';
 
 const BADGE_CLASS = {
   '進行中': 'badge-amber',
   '検討中': 'badge-gray',
   '完了':   'badge-green',
   '待機':   'badge-blue',
-  '令和9年度目標': 'badge-blue',
 };
 const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
 const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
@@ -173,4 +172,3 @@ init();
 </script>
 </body>
 </html>
-```
