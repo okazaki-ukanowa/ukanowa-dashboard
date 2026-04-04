@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>うかのわ 引き継ぎ管理ダッシュボード</title>
+<title>うかのわ ダッシュボード</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -22,81 +22,33 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .site-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.75rem; padding-bottom: 1rem; border-bottom: 1.5px solid var(--border2); }
 .site-title { font-size: 11px; letter-spacing: 0.12em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
 .site-name { font-size: 20px; font-weight: 600; color: var(--text); }
-.header-right { text-align: right; }
 .updated { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
-.btn-print { display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); cursor: pointer; transition: background 0.15s; }
-.btn-print:hover { background: var(--surface2); }.btn-top { display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); text-decoration: none; transition: background 0.15s; }
-.btn-top:hover { background: var(--surface2); }
-.btn-top { display: inline-block; font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 4px 10px; background: var(--surface); color: var(--text2); text-decoration: none; transition: background 0.15s; }
-.btn-top:hover { background: var(--surface2); }
 .section-heading { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.75rem; margin-top: 1.75rem; }
-/* THEMES */
-.themes { display: flex; flex-direction: column; gap: 8px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-.card-header { display: flex; align-items: center; gap: 10px; padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none; }
-.card-header:hover { background: var(--surface2); }
-.card-num { width: 26px; height: 26px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; font-family: 'DM Mono', monospace; }
-.card-title { font-size: 14px; font-weight: 500; flex: 1; }
+.pj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.pj-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.25rem 1rem; display: flex; flex-direction: column; gap: 8px; transition: box-shadow 0.15s; }
+.pj-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.pj-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pj-name { font-size: 15px; font-weight: 600; color: var(--text); }
 .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; border: 1px solid; white-space: nowrap; }
 .badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
 .badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
 .badge-blue  { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
+.badge-red   { background: var(--red-bg);   color: var(--red-text);   border-color: var(--red-border); }
 .badge-gray  { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
-.chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-.card.open .chevron { transform: rotate(180deg); }
-.card-body { display: none; border-top: 1px solid var(--border); padding: 0.875rem 1rem 1rem; }
-.card.open .card-body { display: block; }
-.card-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1rem; }
-.col-label { font-size: 10px; letter-spacing: 0.08em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500; }
-.confirmed-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.confirmed-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
-.confirmed-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
-.t1 .card-num { background: #E8F4E8; color: #2D6A2D; }
-.t2 .card-num { background: #E8F0FC; color: #1A4A9A; }
-.t3 .card-num { background: #FDF3E0; color: #8A5C00; }
-.t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
-.t5 .card-num { background: #FCE8F0; color: #9A1A50; }
-.t6 .card-num { background: #E8F5F5; color: #1A6A6A; }
-/* ACHIEVEMENT LOG */
-.log-list { display: flex; flex-direction: column; gap: 8px; }
-.log-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-.log-card-header { display: flex; align-items: center; gap: 10px; padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none; }
-.log-card-header:hover { background: var(--surface2); }
-.log-card-title { font-size: 13px; font-weight: 500; flex: 1; color: var(--text); }
-.log-card.open .chevron { transform: rotate(180deg); }
-.log-card-body { display: none; border-top: 1px solid var(--border); padding: 0.75rem 1rem 1rem; }
-.log-card.open .log-card-body { display: block; }
-.log-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.log-items li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
-.log-items li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--green-border); }
-.log-note { font-size: 11px; color: var(--text3); font-style: italic; margin-bottom: 8px; }
-/* ABOUT */
-.about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
-.about-sections { display: flex; flex-direction: column; gap: 1.25rem; }
-.about-section-title { font-size: 10px; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; font-weight: 600; margin-bottom: 0.4rem; }
-.about-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
-.about-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.about-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
-.about-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
-/* LOADING / ERROR */
+.pj-next { font-size: 12px; color: var(--text2); line-height: 1.55; flex: 1; }
+.pj-blocker { font-size: 11px; color: var(--red-text); background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius); padding: 4px 8px; line-height: 1.5; }
+.pj-card-footer { display: flex; justify-content: flex-end; padding-top: 4px; border-top: 1px solid var(--border); margin-top: 4px; }
+.btn-open { font-size: 11px; font-family: 'DM Mono', monospace; border: 1px solid var(--border2); border-radius: var(--radius); padding: 3px 10px; background: var(--surface2); color: var(--text2); text-decoration: none; transition: background 0.15s; }
+.btn-open:hover { background: var(--border); }
 .loading { display: flex; align-items: center; gap: 12px; padding: 2rem; color: var(--text3); font-family: 'DM Mono', monospace; font-size: 12px; }
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2); border-top-color: var(--accent); animation: spin 0.7s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .error-msg { padding: 1.25rem 1.5rem; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius-lg); color: var(--red-text); font-size: 13px; line-height: 1.6; }
-.error-msg button { margin-top: 0.75rem; padding: 4px 14px; font-size: 12px; font-family: 'DM Mono', monospace; background: var(--surface); border: 1px solid var(--red-border); border-radius: var(--radius); color: var(--red-text); cursor: pointer; }
-.footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; justify-content: space-between; align-items: center; }
+.footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
 @media (max-width: 480px) {
   .page { padding: 1rem 0.75rem 3rem; }
   .site-name { font-size: 17px; }
-  .card-cols { grid-template-columns: 1fr; }
-}
-@media print {
-  body { background: white; }
-  .btn-print { display: none; }
-  .btn-top { display: none; }
-  .card-body { display: block !important; }
-  .log-card-body { display: block !important; }
-  .chevron { display: none; }
+  .pj-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -105,30 +57,14 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   <div class="site-header">
     <div>
       <div class="site-title">UKANOWA / 岡崎仁志</div>
-      <div class="site-name">引き継ぎ管理ダッシュボード</div>
+      <div class="site-name">ダッシュボード</div>
     </div>
-    <div class="header-right">
-      <div class="updated" id="updated-date">更新日: —</div>
-      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;">
-        <a href="top.html" class="btn-top">← トップへ</a>
-        <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
-      </div>
-    </div>
+    <div class="updated" id="updated-date">更新日: —</div>
   </div>
 
-  <div class="section-heading">THEMES — テーマ別進捗</div>
-  <div class="themes" id="themes-container">
+  <div class="section-heading">PROJECTS — プロジェクト一覧</div>
+  <div id="pj-container">
     <div class="loading"><div class="spinner"></div><span>Notionからデータを取得中...</span></div>
-  </div>
-
-  <div class="section-heading">ACHIEVEMENT LOG — 実績ログ</div>
-  <div class="log-list" id="logs-container">
-    <div class="loading"><div class="spinner"></div><span>実績ログを取得中...</span></div>
-  </div>
-
-  <div class="section-heading">ABOUT THIS SYSTEM — このシステムについて</div>
-  <div id="about-container">
-    <div class="loading"><div class="spinner"></div><span>システム概要を取得中...</span></div>
   </div>
 
   <div class="footer">
@@ -138,122 +74,71 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 <script>
 const WORKER = 'https://ukanowa-api.commonground-oka.workers.dev';
-const PJ = '引き継ぎ管理';
+
+const PJ_LIST = [
+  { key: '引き継ぎ管理', file: 'hikitsugi.html' },
+  { key: '経営管理',     file: 'keiei.html' },
+  { key: 'システム開発', file: 'system.html' },
+  { key: '生産管理',     file: 'seisan.html' },
+  { key: '販売・業務管理', file: 'hanbai.html' },
+  { key: '輸出',         file: 'yushutsu.html' },
+  { key: '経理',         file: 'keiri.html' },
+];
 
 const BADGE_CLASS = {
-  '進行中': 'badge-amber',
-  '検討中': 'badge-gray',
-  '完了':   'badge-green',
-  '待機':   'badge-blue',
+  '🔥進行中': 'badge-amber',
+  '進行中':   'badge-amber',
+  '完了':     'badge-green',
+  '待機':     'badge-blue',
+  '停止':     'badge-red',
 };
-const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
-const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
+
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-function toggleCard(el) {
-  el.closest('.card, .log-card').classList.toggle('open');
-}
+function buildCard(pj, data) {
+  const status   = data.status  || '';
+  const next     = data.next_action || '';
+  const blocker  = data.blocker || '';
+  const badgeCls = BADGE_CLASS[status] || 'badge-gray';
 
-function buildThemeCard(theme, idx) {
-  const num       = theme['番号'] || (idx + 1);
-  const name      = theme['テーマ名'] || '';
-  const badge     = theme['ステータス'] || '';
-  const confirmed = theme['確定事項'] || '';
-  const memo      = theme['メモ'] || '';
-  const colorCls  = THEME_COLOR[(num - 1) % 6];
-  const numChar   = NUM_CHARS[(num - 1) % 6];
-  const badgeCls  = BADGE_CLASS[badge] || 'badge-gray';
-  const confirmedHTML = confirmed
-    ? confirmed.split('\n').filter(l => l.trim()).map(l => '<li>' + esc(l.trim()) + '</li>').join('')
-    : '<li style="color:var(--text3);font-size:12px;">（未設定）</li>';
-  const memoHTML = memo
-    ? '<p style="font-size:13px;color:var(--text2);line-height:1.6;">' + esc(memo) + '</p>'
-    : '<p style="font-size:12px;color:var(--text3);">（なし）</p>';
-  return '<div class="card ' + colorCls + '">'
-    + '<div class="card-header" onclick="toggleCard(this)">'
-    + '<div class="card-num">' + numChar + '</div>'
-    + '<span class="card-title">' + esc(name) + '</span>'
-    + '<span class="badge ' + badgeCls + '">' + esc(badge) + '</span>'
-    + '<span class="chevron">▼</span>'
-    + '</div>'
-    + '<div class="card-body"><div class="card-cols">'
-    + '<div><div class="col-label">CONFIRMED — 確定事項</div><ul class="confirmed-list">' + confirmedHTML + '</ul></div>'
-    + '<div><div class="col-label">MEMO</div>' + memoHTML + '</div>'
-    + '</div></div></div>';
-}
+  const nextLines = next.split('\n').filter(l => l.trim()).slice(0, 3).join(' ／ ');
 
-function buildLogCard(section, idx) {
-  const heading = section.heading || '';
-  const items   = section.items || [];
-  if (heading.includes('更新履歴')) return '';
-  const isNote    = items.length > 0 && items[0].includes('メモリから再構成');
-  const noteHTML  = isNote ? '<p class="log-note">※ ' + esc(items[0]) + '</p>' : '';
-  const listItems = isNote ? items.slice(1) : items;
-  const itemsHTML = listItems.length > 0
-    ? listItems.map(i => '<li>' + esc(i) + '</li>').join('')
-    : '<li style="color:var(--text3);font-size:12px;">（なし）</li>';
-  return '<div class="log-card">'
-    + '<div class="log-card-header" onclick="toggleCard(this)">'
-    + '<span class="log-card-title">' + esc(heading) + '</span>'
-    + '<span class="badge badge-green">完了</span>'
-    + '<span class="chevron">▼</span>'
+  const blockerHTML = blocker
+    ? '<div class="pj-blocker">🚧 ' + esc(blocker) + '</div>'
+    : '';
+
+  return '<div class="pj-card">'
+    + '<div class="pj-card-top">'
+    + '<span class="pj-name">' + esc(pj.key) + '</span>'
+    + '<span class="badge ' + badgeCls + '">' + esc(status) + '</span>'
     + '</div>'
-    + '<div class="log-card-body">' + noteHTML + '<ul class="log-items">' + itemsHTML + '</ul></div>'
+    + blockerHTML
+    + '<p class="pj-next">' + esc(nextLines || '—') + '</p>'
+    + '<div class="pj-card-footer">'
+    + '<a href="' + pj.file + '" class="btn-open">開く →</a>'
+    + '</div>'
     + '</div>';
-}
-
-function buildAbout(sections) {
-  const filtered = sections.filter(s => !s.heading.includes('更新履歴'));
-  const html = filtered.map(s => {
-    const isList   = s.items.length > 1;
-    const bodyHTML = isList
-      ? '<ul class="about-list">' + s.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>'
-      : '<p class="about-body">' + esc(s.items[0] || '') + '</p>';
-    return '<div>'
-      + '<div class="about-section-title">' + esc(s.heading.toUpperCase()) + '</div>'
-      + bodyHTML
-      + '</div>';
-  }).join('');
-  return '<div class="about-card"><div class="about-sections">' + html + '</div></div>';
 }
 
 async function init() {
   document.getElementById('updated-date').textContent =
     '更新日: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const themesEl = document.getElementById('themes-container');
-  try {
-    const res = await fetch(WORKER + '/themes?pj=' + encodeURIComponent(PJ));
-    if (!res.ok) throw new Error('取得エラー: ' + res.status);
-    const data = await res.json();
-    if (!data.themes || data.themes.length === 0) {
-      themesEl.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">テーマがまだ登録されていません。</p>';
-    } else {
-      themesEl.innerHTML = data.themes.map((t, i) => buildThemeCard(t, i)).join('');
-    }
-  } catch (e) {
-    themesEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small><br><button onclick="init()">再試行</button></div>';
-  }
+  const container = document.getElementById('pj-container');
 
-  const logsEl = document.getElementById('logs-container');
   try {
-    const res = await fetch(WORKER + '/logs?type=logs');
-    if (!res.ok) throw new Error('取得エラー: ' + res.status);
-    const data = await res.json();
-    const cards = (data.sections || []).map((s, i) => buildLogCard(s, i)).filter(Boolean).join('');
-    logsEl.innerHTML = cards || '<p style="color:var(--text3);font-size:13px;padding:1rem 0;">実績ログがありません。</p>';
-  } catch (e) {
-    logsEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small></div>';
-  }
+    const results = await Promise.all(
+      PJ_LIST.map(pj =>
+        fetch(WORKER + '/context?pj=' + encodeURIComponent(pj.key))
+          .then(r => r.ok ? r.json() : { status: '', next_action: '', blocker: '' })
+          .catch(() => ({ status: '', next_action: '', blocker: '' }))
+      )
+    );
 
-  const aboutEl = document.getElementById('about-container');
-  try {
-    const res = await fetch(WORKER + '/logs?type=about');
-    if (!res.ok) throw new Error('取得エラー: ' + res.status);
-    const data = await res.json();
-    aboutEl.innerHTML = buildAbout(data.sections || []);
+    const html = PJ_LIST.map((pj, i) => buildCard(pj, results[i])).join('');
+    container.innerHTML = '<div class="pj-grid">' + html + '</div>';
   } catch (e) {
-    aboutEl.innerHTML = '<div class="error-msg">取得失敗<br><small>' + esc(e.message) + '</small></div>';
+    container.innerHTML = '<div class="error-msg">取得失敗: ' + esc(e.message) + '</div>';
   }
 }
 
