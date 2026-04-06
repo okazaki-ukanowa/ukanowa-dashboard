@@ -3,841 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>うかのわ 経営管理ダッシュボード</title>
+<title>うかのわ ダッシュボード</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F7F5F0;
-  --surface: #FFFFFF;
-  --surface2: #F0EDE6;
-  --border: #E2DDD5;
-  --border2: #CCC8C0;
-  --text: #1A1816;
-  --text2: #6B6560;
-  --text3: #9B958E;
-  --green-bg: #E8F4E8;
-  --green-text: #2D6A2D;
-  --green-border: #A8D4A8;
-  --amber-bg: #FDF3E0;
-  --amber-text: #8A5C00;
-  --amber-border: #F0CC80;
-  --red-bg: #FDE8E8;
-  --red-text: #8A2020;
-  --red-border: #F0A8A8;
-  --blue-bg: #E8F0FC;
-  --blue-text: #1A4A9A;
-  --blue-border: #A8C0F0;
-  --accent: #2D6A2D;
-  --radius: 8px;
-  --radius-lg: 12px;
+  --bg:#F7F5F0;--surface:#FFF;--surface2:#F0EDE6;--border:#E2DDD5;--border2:#CCC8C0;
+  --text:#1A1816;--text2:#6B6560;--text3:#9B958E;
+  --green-bg:#E8F4E8;--green-text:#2D6A2D;--green-border:#A8D4A8;
+  --amber-bg:#FDF3E0;--amber-text:#8A5C00;--amber-border:#F0CC80;
+  --accent:#2D6A2D;--radius:8px;--radius-lg:12px;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;}
+.page{max-width:720px;margin:0 auto;padding:3rem 1.5rem 4rem;}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Header */
+.site-header{margin-bottom:2.5rem;padding-bottom:1.25rem;border-bottom:1.5px solid var(--border2);}
+.site-label{font-size:11px;letter-spacing:.12em;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:6px;}
+.site-name{font-size:24px;font-weight:600;color:var(--text);}
+.site-sub{font-size:12px;color:var(--text3);margin-top:4px;}
 
-body {
-  font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
+/* Section */
+.section-heading{font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:.75rem;margin-top:2rem;}
 
-/* ── Layout ── */
-.page { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+/* Nav cards */
+.nav-grid{display:flex;flex-direction:column;gap:8px;}
+.nav-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;text-decoration:none;color:var(--text);transition:background .15s,border-color .15s;}
+.nav-card:hover{background:var(--surface2);border-color:var(--border2);}
+.nav-card.disabled{opacity:.45;pointer-events:none;cursor:default;}
+.nav-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.nav-body{flex:1;}
+.nav-title{font-size:14px;font-weight:500;color:var(--text);}
+.nav-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.nav-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;border:1px solid;white-space:nowrap;flex-shrink:0;}
+.badge-amber{background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border);}
+.badge-gray{background:var(--surface2);color:var(--text2);border-color:var(--border2);}
+.badge-green{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
+.nav-arrow{font-size:12px;color:var(--text3);flex-shrink:0;margin-left:4px;}
 
-/* ── Header ── */
-.site-header {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  margin-bottom: 1.75rem; padding-bottom: 1rem;
-  border-bottom: 1.5px solid var(--border2);
-}
-.site-title { font-size: 11px; letter-spacing: 0.12em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
-.site-name { font-size: 20px; font-weight: 600; color: var(--text); }
-.header-right { text-align: right; }
-.updated { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
-.btn-print {
-  margin-top: 6px; display: inline-block;
-  font-size: 11px; font-family: 'DM Mono', monospace;
-  border: 1px solid var(--border2); border-radius: var(--radius);
-  padding: 4px 10px; background: var(--surface); color: var(--text2);
-  cursor: pointer; transition: background 0.15s;
-}
-.btn-print:hover { background: var(--surface2); }
+/* Footer */
+.footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
 
-/* ── Metrics ── */
-.metrics {
-  display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
-  margin-bottom: 1.75rem;
-}
-.met { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.875rem 1rem; }
-.met-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; margin-bottom: 4px; }
-.met-value { font-size: 22px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
-.met-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
-
-/* ── Section heading ── */
-.section-heading {
-  font-size: 10px; letter-spacing: 0.1em; color: var(--text3);
-  font-family: 'DM Mono', monospace;
-  margin-bottom: 0.75rem; margin-top: 1.75rem;
-}
-
-/* ── Cards ── */
-.themes { display: flex; flex-direction: column; gap: 8px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-.card-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0.875rem 1rem; cursor: pointer; transition: background 0.15s; user-select: none;
-}
-.card-header:hover { background: var(--surface2); }
-.card-num {
-  width: 26px; height: 26px; border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 600; flex-shrink: 0; font-family: 'DM Mono', monospace;
-}
-.card-title { font-size: 14px; font-weight: 500; flex: 1; }
-.card-progress { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-right: 4px; }
-.badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; border: 1px solid; white-space: nowrap; }
-.badge-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
-.badge-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
-.badge-blue  { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
-.badge-gray  { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
-.chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-.card.open .chevron { transform: rotate(180deg); }
-.card-body { display: none; border-top: 1px solid var(--border); padding: 0.875rem 1rem 1rem; }
-.card.open .card-body { display: block; }
-
-/* ── Card two-col ── */
-.card-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1rem; }
-.col-label { font-size: 10px; letter-spacing: 0.08em; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; font-weight: 500; }
-
-/* ── Confirmed list ── */
-.confirmed-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.confirmed-list li { font-size: 13px; color: var(--text2); padding-left: 14px; position: relative; line-height: 1.55; }
-.confirmed-list li::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
-
-/* ── Action items ── */
-.action-list { display: flex; flex-direction: column; gap: 5px; }
-.action-item {
-  display: flex; align-items: flex-start; gap: 8px;
-  background: var(--surface2); border-radius: var(--radius);
-  padding: 7px 10px; transition: background 0.15s;
-}
-.action-item:hover { background: var(--border); }
-.action-item.done { opacity: 0.45; }
-.action-item.done .action-text { text-decoration: line-through; }
-.action-check {
-  width: 16px; height: 16px; border-radius: 4px;
-  border: 1.5px solid var(--border2); background: var(--surface);
-  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
-  justify-content: center; transition: all 0.15s; cursor: pointer;
-}
-.action-check:hover { border-color: var(--accent); }
-.action-item.done .action-check { background: var(--accent); border-color: var(--accent); }
-.action-item.done .action-check::after { content: '✓'; color: white; font-size: 10px; font-weight: 600; }
-.action-item.updating .action-check { opacity: 0.5; pointer-events: none; }
-.action-num { font-size: 10px; font-weight: 500; color: var(--text3); font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 2px; min-width: 16px; }
-.action-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
-.action-status { font-size: 9px; padding: 1px 6px; border-radius: 99px; font-weight: 500; border: 1px solid; align-self: center; flex-shrink: 0; background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
-
-/* ── Memo ── */
-.memo-area { margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid var(--border); }
-.memo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.memo-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; }
-.memo-save-indicator { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; opacity: 0; transition: opacity 0.3s; }
-.memo-save-indicator.visible { opacity: 1; }
-.memo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.memo-col-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; margin-bottom: 4px; }
-.memo-col-label.decided { color: var(--green-text); }
-.memo-col-label.considering { color: var(--amber-text); }
-.memo-input {
-  width: 100%; min-height: 52px; resize: vertical;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface2); color: var(--text);
-  font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
-  padding: 8px 10px; outline: none; transition: border 0.15s; line-height: 1.55;
-}
-.memo-input:focus { border-color: var(--border2); background: var(--surface); }
-.memo-input::placeholder { color: var(--text3); }
-
-/* ── Theme Summary ── */
-.theme-summary {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding: 6px 12px; margin-bottom: 0.75rem;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-family: 'DM Mono', monospace; font-size: 11px;
-}
-.sum-total { color: var(--text2); font-weight: 500; }
-.sum-sep { color: var(--border2); }
-.sum-done { color: var(--green-text); }
-.sum-progress { color: var(--amber-text); }
-.sum-r9 { color: var(--blue-text); }
-.sum-gray { color: var(--text3); }
-
-/* ── Loan table ── */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.loan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.loan-table th { font-size: 10px; font-weight: 500; color: var(--text3); padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; white-space: nowrap; }
-.loan-table th:first-child { text-align: left; }
-.loan-table td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; white-space: nowrap; }
-.loan-table td:first-child { text-align: left; font-family: 'Noto Sans JP', sans-serif; color: var(--text2); }
-.loan-table tr:last-child td { border-bottom: none; font-weight: 600; color: var(--text); }
-
-/* ── Theme color accents ── */
-.t1 .card-num { background: #E8F4E8; color: #2D6A2D; }
-.t2 .card-num { background: #E8F0FC; color: #1A4A9A; }
-.t3 .card-num { background: #FDF3E0; color: #8A5C00; }
-.t4 .card-num { background: #F0E8FC; color: #5A1A9A; }
-.t5 .card-num { background: #FCE8F0; color: #9A1A50; }
-.t6 .card-num { background: #E8F5F5; color: #1A6A6A; }
-
-/* ── Loading & Error ── */
-.loading {
-  display: flex; align-items: center; gap: 12px;
-  padding: 2rem; color: var(--text3); font-family: 'DM Mono', monospace; font-size: 12px;
-}
-.spinner {
-  width: 18px; height: 18px; border-radius: 50%;
-  border: 2px solid var(--border2); border-top-color: var(--accent);
-  animation: spin 0.7s linear infinite; flex-shrink: 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.error-msg {
-  padding: 1.25rem 1.5rem; background: var(--red-bg); border: 1px solid var(--red-border);
-  border-radius: var(--radius-lg); color: var(--red-text); font-size: 13px; line-height: 1.6;
-}
-.error-msg button {
-  margin-top: 0.75rem; padding: 4px 14px; font-size: 12px; font-family: 'DM Mono', monospace;
-  background: var(--surface); border: 1px solid var(--red-border); border-radius: var(--radius);
-  color: var(--red-text); cursor: pointer;
-}
-.error-msg button:hover { background: var(--red-bg); }
-
-/* ── Add Task ── */
-.btn-add-task {
-  display: flex; align-items: center; gap: 5px;
-  margin-top: 6px; padding: 5px 8px;
-  font-size: 12px; color: var(--text3); font-family: 'Noto Sans JP', sans-serif;
-  background: none; border: 1px dashed var(--border2); border-radius: var(--radius);
-  cursor: pointer; width: 100%; transition: all 0.15s;
-}
-.btn-add-task:hover { color: var(--accent); border-color: var(--accent); background: var(--green-bg); }
-.btn-add-task-icon { font-size: 14px; line-height: 1; }
-.add-task-form { display: none; margin-top: 6px; }
-.add-task-form.open { display: flex; gap: 6px; }
-.add-task-input {
-  flex: 1; padding: 6px 10px; font-size: 13px;
-  font-family: 'Noto Sans JP', sans-serif;
-  border: 1px solid var(--border2); border-radius: var(--radius);
-  background: var(--surface); color: var(--text); outline: none;
-  transition: border 0.15s;
-}
-.add-task-input:focus { border-color: var(--accent); }
-.add-task-submit {
-  padding: 6px 12px; font-size: 12px; font-family: 'DM Mono', monospace;
-  background: var(--accent); color: white; border: none;
-  border-radius: var(--radius); cursor: pointer; white-space: nowrap;
-  transition: opacity 0.15s;
-}
-.add-task-submit:hover { opacity: 0.85; }
-.add-task-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* ── Reset button ── */
-.btn-reset {
-  font-size: 11px; color: var(--text3); background: none;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 3px 10px; cursor: pointer; font-family: 'DM Mono', monospace; margin-top: 4px;
-}
-.btn-reset:hover { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
-
-/* ── Footer ── */
-.footer {
-  margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);
-  font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace;
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-/* ── Responsive ── */
-@media (max-width: 480px) {
-  .page { padding: 1rem 0.75rem 3rem; }
-  .site-header { margin-bottom: 1.25rem; }
-  .site-name { font-size: 17px; }
-  .updated { font-size: 10px; }
-  .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 1.25rem; }
-  .met { padding: 0.625rem 0.75rem; }
-  .met-value { font-size: 18px; }
-  .met-sub { font-size: 9px; }
-  .section-heading { margin-top: 1.25rem; }
-  .card-header { padding: 0.75rem 0.875rem; gap: 8px; }
-  .card-body { padding: 0.75rem 0.875rem 0.875rem; }
-  .card-title { font-size: 13px; }
-  .badge { font-size: 9px; padding: 2px 6px; }
-  .card-cols { grid-template-columns: 1fr; gap: 0.875rem; }
-  .confirmed-list li { font-size: 12px; }
-  .action-text { font-size: 12px; }
-  .action-item { padding: 6px 8px; }
-  .memo-area { margin-top: 0.75rem; padding-top: 0.75rem; }
-  .memo-cols { grid-template-columns: 1fr; }
-  .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
-}
-
-/* ── Print ── */
-@media print {
-  body { background: white; font-size: 12px; }
-  .btn-print, .btn-reset, .memo-input, .loading, .error-msg { display: none; }
-  .card { break-inside: avoid; border: 1px solid #ccc; }
-  .card-body { display: block !important; }
-  .chevron { display: none; }
-  .page { padding: 1rem; }
+@media(max-width:480px){
+  .page{padding:1.5rem .75rem 3rem;}
+  .site-name{font-size:20px;}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Header -->
   <div class="site-header">
-    <div>
-      <div class="site-title">UKANOWA / 岡崎仁志</div>
-      <div class="site-name">経営管理ダッシュボード</div>
-    </div>
-    <div class="header-right">
-      <div class="updated" id="updated-date">更新日: —</div>
-      <button class="btn-print" onclick="window.print()">印刷 / PDF保存</button>
-    </div>
+    <div class="site-label">UKANOWA / 岡崎仁志</div>
+    <div class="site-name">うかのわ 経営ダッシュボード</div>
+    <div class="site-sub">愛媛県松山市 / 有機米農家 / 経営面積 12→30ha</div>
   </div>
 
-  <!-- Metrics (static) -->
-  <div class="metrics">
-    <div class="met">
-      <div class="met-label">令和7年 所得</div>
-      <div class="met-value">1,230万</div>
-      <div class="met-sub">所得率 約44%（業界平均を大幅超）</div>
-    </div>
-    <div class="met">
-      <div class="met-label">借入残高（前島除く）</div>
-      <div class="met-value">2,534万</div>
-      <div class="met-sub">年間返済 256万円</div>
-    </div>
-    <div class="met">
-      <div class="met-label">新規投資総額</div>
-      <div class="met-value">5,750万</div>
-      <div class="met-sub">倉庫4,500 + 設備自己負担1,250</div>
-    </div>
-    <div class="met">
-      <div class="met-label">経営面積</div>
-      <div class="met-value">12→30ha</div>
-      <div class="met-sub">拡大進行中（8年目）</div>
-    </div>
-  </div>
+  <div class="section-heading">DASHBOARDS — 管理画面一覧</div>
+  <div class="nav-grid">
 
-  <!-- Finance (static) -->
-  <div class="section-heading">FINANCIAL — 借入残高明細（令和8年3月現在）</div>
-  <div class="card">
-    <div class="card-header" onclick="toggleCard(this)">
-      <div class="card-num" style="background:#F0EDE6;color:#6B6560;">¥</div>
-      <span class="card-title">借入残高・償還計画</span>
-      <span class="badge badge-gray">参照用</span>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="card-body">
-      <div class="table-wrap">
-        <table class="loan-table">
-          <thead>
-            <tr><th>借入先・用途</th><th>貸付額</th><th>現残高</th><th>年間返済</th><th>利率</th><th>完済</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>公庫① 乾燥機等</td><td>420万</td><td>360万</td><td>60万</td><td>0.00%</td><td>R13</td></tr>
-            <tr><td>公庫② トラクター・倉庫</td><td>1,390万</td><td>1,390万</td><td>100万</td><td>0.00%</td><td>R21</td></tr>
-            <tr><td>公庫③ コンバイン</td><td>280万</td><td>280万</td><td>40万</td><td>0.60%</td><td>R15</td></tr>
-            <tr><td>JA 管理・播種・除草</td><td>561万</td><td>504万</td><td>56万</td><td>0.20%</td><td>R16</td></tr>
-            <tr><td>合計（前島除く）</td><td>2,651万</td><td>2,534万</td><td>256万</td><td>—</td><td>—</td></tr>
-          </tbody>
-        </table>
+    <a href="keiei.html" class="nav-card">
+      <div class="nav-icon" style="background:#E8F4E8;">📊</div>
+      <div class="nav-body">
+        <div class="nav-title">経営管理・戦略</div>
+        <div class="nav-desc">融資計画・補助申請・設備投資・輸出・法人化</div>
       </div>
-    </div>
+      <span class="nav-badge badge-amber">進行中</span>
+      <span class="nav-arrow">›</span>
+    </a>
+
+    <a href="seisan.html" class="nav-card disabled">
+      <div class="nav-icon" style="background:#E8F5F0;">🌾</div>
+      <div class="nav-body">
+        <div class="nav-title">生産管理</div>
+        <div class="nav-desc">圃場・作付け・収量・品質管理</div>
+      </div>
+      <span class="nav-badge badge-gray">準備中</span>
+      <span class="nav-arrow">›</span>
+    </a>
+
+    <a href="hanbai.html" class="nav-card disabled">
+      <div class="nav-icon" style="background:#FDF3E0;">🛒</div>
+      <div class="nav-body">
+        <div class="nav-title">販売・業務管理</div>
+        <div class="nav-desc">直販・卸・注文管理・予約</div>
+      </div>
+      <span class="nav-badge badge-gray">準備中</span>
+      <span class="nav-arrow">›</span>
+    </a>
+
+    <a href="yushutsu.html" class="nav-card disabled">
+      <div class="nav-icon" style="background:#E8F0FC;">✈️</div>
+      <div class="nav-body">
+        <div class="nav-title">輸出</div>
+        <div class="nav-desc">香港・台湾向け有機JAS米 輸出計画</div>
+      </div>
+      <span class="nav-badge badge-gray">準備中</span>
+      <span class="nav-arrow">›</span>
+    </a>
+
   </div>
 
-  <!-- Themes (動的描画) -->
-  <div class="section-heading">THEMES — テーマ別進捗</div>
-  <div class="theme-summary" id="theme-summary" style="display:none;"></div>
-  <div class="themes" id="themes-container">
-    <div class="loading">
-      <div class="spinner"></div>
-      <span>Notionからデータを取得中...</span>
-    </div>
-  </div>
-
-  <!-- Footer -->
   <div class="footer">
-    <span>うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411</span>
-    <button class="btn-reset" onclick="resetAll()">チェックをリセット</button>
+    うかのわ / 愛媛県松山市久米窪田町294-1 / 090-2695-9411
   </div>
 
-</div><!-- /page -->
-
-<script>
-// ── 定数 ──────────────────────────────────────────────
-const WORKER    = 'https://ukanowa-api.commonground-oka.workers.dev';
-const THEME_DB  = '51e310b0f1114e11856b9eac6703f04a';
-const TASK_DB   = '32843c0d-960c-80dc-a210-c0b3b7e60ee7';
-
-// テーマDB テーマ名 → タスクDB テーマ値 対応表
-const THEME_TASK_MAP = {
-  '融資・資金調達戦略': '資金調達',
-  'スマ転・補助申請準備': '補助金申請',
-  '輸出市場開拓（香港・台湾）': '輸出',
-  '米加工ライン整備': '加工・販売',
-  '税理士変更・法人化': '経営基盤',
-  '設備投資・施設整備': '設備投資',
-};
-
-const BADGE_CLASS = {
-  '進行中': 'badge-amber',
-  '令和9年度目標': 'badge-blue',
-  '検討中': 'badge-gray',
-  '完了': 'badge-green',
-};
-
-const THEME_COLOR = ['t1','t2','t3','t4','t5','t6'];
-const NUM_CHARS   = ['①','②','③','④','⑤','⑥'];
-const STORAGE_KEY = 'ukanowa_dash_v2';
-
-// ── Worker API ────────────────────────────────────────
-async function queryDB(dbId, opts = {}) {
-  const res = await fetch(`${WORKER}/databases/${dbId}/query`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(opts),
-  });
-  if (!res.ok) throw new Error(`DB取得エラー: ${res.status} ${res.statusText}`);
-  return res.json();
-}
-
-async function patchPage(pageId, properties) {
-  const res = await fetch(`${WORKER}/pages/${pageId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ properties }),
-  });
-  if (!res.ok) throw new Error(`更新エラー: ${res.status} ${res.statusText}`);
-  return res.json();
-}
-
-async function createPage(databaseId, properties) {
-  const res = await fetch(`${WORKER}/pages`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      parent: { database_id: databaseId },
-      properties,
-    }),
-  });
-  if (!res.ok) throw new Error(`作成エラー: ${res.status} ${res.statusText}`);
-  return res.json();
-}
-
-// ── Notion プロパティ取得ヘルパー ─────────────────────
-const getTitle = (page, key = 'テーマ名') => {
-  const p = page.properties[key] || page.properties['名前'];
-  return p?.title?.[0]?.plain_text || '';
-};
-const getRichText = (page, key) =>
-  page.properties[key]?.rich_text?.[0]?.plain_text || '';
-const getSelect = (page, key) =>
-  page.properties[key]?.select?.name || '';
-const getStatus = (page, key) =>
-  page.properties[key]?.status?.name || '';
-const getNumber = (page, key) =>
-  page.properties[key]?.number ?? 0;
-
-// ── メモ パース / 結合 ──────────────────────────────────
-const MEMO_MARKER = '【検討中】';
-function parseMemo(raw) {
-  const d = raw || '';
-  const idx = d.indexOf(MEMO_MARKER);
-  if (idx === -1) return { decided: d.trim(), considering: '' };
-  return {
-    decided:     d.slice(0, idx).trim(),
-    considering: d.slice(idx + MEMO_MARKER.length).trim(),
-  };
-}
-function buildMemoContent(decided, considering) {
-  if (!considering.trim()) return decided.trim();
-  return `${decided.trim()}\n${MEMO_MARKER}\n${considering.trim()}`;
-}
-
-// ── HTML エスケープ ────────────────────────────────────
-const esc = s => String(s)
-  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;');
-
-// ── localStorage ────────────────────────────────────────
-const getState = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } };
-const setState = s  => localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-
-// ── カード開閉 ────────────────────────────────────────
-function toggleCard(header) {
-  const card = header.closest('.card');
-  card.classList.toggle('open');
-  const s = getState();
-  if (!s.open) s.open = {};
-  s.open[card.id] = card.classList.contains('open');
-  setState(s);
-}
-
-// ── チェックボックス ON/OFF → Notion ステータス更新 ────
-async function toggleTask(checkEl) {
-  const item = checkEl.closest('.action-item');
-  const pageId = item.dataset.pageId;
-  if (!pageId) return;
-
-  const wasDone = item.classList.contains('done');
-  const newStatus = wasDone ? '未着手' : '完了';
-
-  // 楽観的UI更新
-  item.classList.toggle('done', !wasDone);
-  item.classList.add('updating');
-  updateProgress(item.closest('.action-list'));
-
-  try {
-    await patchPage(pageId, {
-      'ステータス': { status: { name: newStatus } },
-    });
-  } catch (e) {
-    console.error('ステータス更新失敗:', e);
-    // ロールバック
-    item.classList.toggle('done', wasDone);
-    updateProgress(item.closest('.action-list'));
-    showToast('ステータスの更新に失敗しました');
-  } finally {
-    item.classList.remove('updating');
-  }
-}
-
-// ── 進捗カウンター更新 ─────────────────────────────────
-function updateProgress(list) {
-  if (!list) return;
-  const themeNum = list.dataset.theme;
-  const total = list.querySelectorAll('.action-item').length;
-  const done  = list.querySelectorAll('.action-item.done').length;
-  const el = document.getElementById('prog-' + themeNum);
-  if (el && total) el.textContent = `${done}/${total}`;
-}
-
-// ── メモ保存（1秒デバウンス）→ テーマDB メモ更新 ────────
-const memoTimers = {};
-function scheduleMemoSave(textarea) {
-  const notionId = textarea.dataset.notionId;
-  if (!notionId) return;
-
-  const memoArea = textarea.closest('.memo-area');
-  const indicator = memoArea?.querySelector('.memo-save-indicator');
-  if (indicator) { indicator.textContent = '...'; indicator.classList.add('visible'); }
-
-  clearTimeout(memoTimers[notionId]);
-  memoTimers[notionId] = setTimeout(async () => {
-    const decided     = memoArea?.querySelector('.memo-decided')?.value     || '';
-    const considering = memoArea?.querySelector('.memo-considering')?.value || '';
-    const combined    = buildMemoContent(decided, considering);
-    try {
-      await patchPage(notionId, {
-        'メモ': { rich_text: [{ type: 'text', text: { content: combined } }] },
-      });
-      if (indicator) { indicator.textContent = '保存済み ✓'; }
-    } catch (e) {
-      console.error('メモ保存失敗:', e);
-      if (indicator) { indicator.textContent = '保存失敗 ✕'; }
-      showToast('メモの保存に失敗しました');
-    } finally {
-      setTimeout(() => {
-        if (indicator) indicator.classList.remove('visible');
-      }, 2000);
-    }
-  }, 1000);
-}
-
-// ── トースト通知 ────────────────────────────────────────
-function showToast(msg) {
-  let t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#1A1816;color:#fff;font-size:12px;font-family:"DM Mono",monospace;padding:8px 14px;border-radius:8px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
-}
-
-// ── テーマカード HTML 生成 ─────────────────────────────
-function buildThemeCard(theme, idx, tasksByTheme) {
-  const num      = getNumber(theme, '番号') || (idx + 1);
-  const name     = getTitle(theme, 'テーマ名');
-  const badge    = getSelect(theme, 'ステータスバッジ');
-  const confirmed = getRichText(theme, '確定事項');
-  const memo     = getRichText(theme, 'メモ');
-  const colorCls = THEME_COLOR[(num - 1)] || 't6';
-  const numChar  = NUM_CHARS[(num - 1)]   || `⑥`;
-  const badgeCls = BADGE_CLASS[badge]     || 'badge-gray';
-  const cardId   = `card-${num}`;
-  const isOpen   = getState().open?.[cardId];
-
-  // タスクを取得（テーマ名マッピング）
-  const taskKey = THEME_TASK_MAP[name] || name;
-  const tasks   = (tasksByTheme[taskKey] || []).slice().sort((a, b) => {
-    const sa = getStatus(a, 'ステータス'), sb = getStatus(b, 'ステータス');
-    const pa = getSelect(a, '優先度'),     pb = getSelect(b, '優先度');
-    if (sa === '進行中' && sb !== '進行中') return -1;
-    if (sb === '進行中' && sa !== '進行中') return  1;
-    if (pa.includes('🔴') && !pb.includes('🔴')) return -1;
-    if (pb.includes('🔴') && !pa.includes('🔴')) return  1;
-    return 0;
-  });
-
-  const doneCnt = tasks.filter(t => getStatus(t, 'ステータス') === '完了').length;
-  const progTxt = tasks.length ? `${doneCnt}/${tasks.length}` : '';
-
-  // 確定事項
-  const confirmedHTML = confirmed
-    ? confirmed.split('\n').filter(l => l.trim())
-        .map(l => `<li>${esc(l.trim())}</li>`).join('')
-    : '<li style="color:var(--text3);font-size:12px;">（未設定）</li>';
-
-  // タスク
-  const tasksHTML = tasks.length
-    ? tasks.map((task, i) => {
-        const status     = getStatus(task, 'ステータス');
-        const isDone     = status === '完了';
-        const isProgress = status === '進行中';
-        return `
-        <div class="action-item${isDone ? ' done' : ''}" data-page-id="${task.id}">
-          <div class="action-check" onclick="toggleTask(this)"></div>
-          <span class="action-num">${String(i + 1).padStart(2, '0')}</span>
-          <span class="action-text">${esc(getTitle(task, '名前'))}</span>
-          ${isProgress ? '<span class="action-status">進行中</span>' : ''}
-        </div>`;
-      }).join('')
-    : '<p style="font-size:12px;color:var(--text3);padding:4px 0;">タスクなし</p>';
-
-  return `
-  <div class="card ${colorCls}${isOpen ? ' open' : ''}" id="${cardId}" data-notion-id="${theme.id}">
-    <div class="card-header" onclick="toggleCard(this)">
-      <div class="card-num">${numChar}</div>
-      <span class="card-title">${esc(name)}</span>
-      <span class="card-progress" id="prog-${num}">${progTxt}</span>
-      <span class="badge ${badgeCls}">${esc(badge)}</span>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="card-body">
-      <div class="card-cols">
-        <div>
-          <div class="col-label">CONFIRMED — 確定事項</div>
-          <ul class="confirmed-list">${confirmedHTML}</ul>
-        </div>
-        <div>
-          <div class="col-label">NEXT ACTIONS</div>
-          <div class="action-list" data-theme="${num}">${tasksHTML}</div>
-          <button class="btn-add-task" onclick="showAddTask(this)">
-            <span class="btn-add-task-icon">＋</span> タスクを追加
-          </button>
-          <div class="add-task-form" data-task-key="${esc(taskKey)}" data-theme-num="${num}">
-            <input class="add-task-input" type="text" placeholder="タスク名を入力... (Enterで追加)"
-              onkeydown="if(event.key==='Enter')submitNewTask(this)"
-              onkeyup="if(event.key==='Escape')cancelAddTask(this)">
-            <button class="add-task-submit" onclick="submitNewTask(this.previousElementSibling)">追加</button>
-          </div>
-        </div>
-      </div>
-      <div class="memo-area">
-        <div class="memo-header">
-          <div class="memo-label">MEMO</div>
-          <span class="memo-save-indicator"></span>
-        </div>
-        <div class="memo-cols">
-          <div>
-            <div class="memo-col-label decided">✅ 決定事項</div>
-            <textarea class="memo-input memo-decided"
-              placeholder="確定した内容..."
-              data-notion-id="${theme.id}"
-              oninput="scheduleMemoSave(this)">${esc(parseMemo(memo).decided)}</textarea>
-          </div>
-          <div>
-            <div class="memo-col-label considering">🟡 検討中</div>
-            <textarea class="memo-input memo-considering"
-              placeholder="検討中・未確定の内容..."
-              data-notion-id="${theme.id}"
-              oninput="scheduleMemoSave(this)">${esc(parseMemo(memo).considering)}</textarea>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ── タスク追加UI ────────────────────────────────────────
-function showAddTask(btn) {
-  const form = btn.nextElementSibling;
-  btn.style.display = 'none';
-  form.classList.add('open');
-  form.querySelector('.add-task-input').focus();
-}
-
-function cancelAddTask(inputOrBtn) {
-  const form = inputOrBtn.closest('.add-task-form');
-  form.classList.remove('open');
-  form.querySelector('.add-task-input').value = '';
-  form.previousElementSibling.style.display = '';
-}
-
-async function submitNewTask(input) {
-  const name = input.value.trim();
-  if (!name) return;
-
-  const form      = input.closest('.add-task-form');
-  const taskKey   = form.dataset.taskKey;
-  const themeNum  = form.dataset.themeNum;
-  const submitBtn = form.querySelector('.add-task-submit');
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = '追加中...';
-
-  try {
-    const newPage = await createPage(TASK_DB, {
-      '名前':     { title: [{ text: { content: name } }] },
-      'テーマ':   { select: { name: taskKey } },
-      'ステータス': { status: { name: '未着手' } },
-    });
-
-    // リストに楽観的追加
-    const list = document.querySelector(`.action-list[data-theme="${themeNum}"]`);
-    const emptyMsg = list.querySelector('p');
-    if (emptyMsg) emptyMsg.remove();
-
-    const count = list.querySelectorAll('.action-item').length + 1;
-    const div = document.createElement('div');
-    div.className = 'action-item';
-    div.dataset.pageId = newPage.id;
-    div.innerHTML = `
-      <div class="action-check" onclick="toggleTask(this)"></div>
-      <span class="action-num">${String(count).padStart(2, '0')}</span>
-      <span class="action-text">${esc(name)}</span>`;
-    list.appendChild(div);
-    updateProgress(list);
-
-    // フォームをリセット
-    input.value = '';
-    cancelAddTask(input);
-    showToast(`「${name}」を追加しました`);
-
-  } catch (e) {
-    console.error('タスク作成失敗:', e);
-    showToast('タスクの作成に失敗しました');
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = '追加';
-  }
-}
-
-// ── テーマ横断サマリー更新 ────────────────────────────────
-function updateThemeSummary() {
-  const el = document.getElementById('theme-summary');
-  if (!el) return;
-  const cards = document.querySelectorAll('#themes-container .card');
-  if (!cards.length) return;
-
-  let done = 0, inProgress = 0, r9 = 0, considering = 0;
-  cards.forEach(card => {
-    const badge = card.querySelector('.card-header .badge');
-    const txt = badge?.textContent?.trim() || '';
-    if (txt === '完了')          done++;
-    else if (txt === '進行中')   inProgress++;
-    else if (txt.includes('令和9')) r9++;
-    else                          considering++;
-  });
-
-  const parts = [];
-  if (done)        parts.push(`<span class="sum-done">完了 ${done}</span>`);
-  if (inProgress)  parts.push(`<span class="sum-progress">進行中 ${inProgress}</span>`);
-  if (r9)          parts.push(`<span class="sum-r9">R9目標 ${r9}</span>`);
-  if (considering) parts.push(`<span class="sum-gray">検討中 ${considering}</span>`);
-
-  el.innerHTML =
-    `<span class="sum-total">${cards.length}テーマ</span>` +
-    `<span class="sum-sep">|</span>` +
-    parts.join('<span class="sum-sep"> · </span>');
-  el.style.display = 'flex';
-}
-
-// ── チェックリセット ───────────────────────────────────
-async function resetAll() {
-  if (!confirm('すべてのチェックをリセットしますか？\nNotionのステータスも「未着手」に戻ります。')) return;
-
-  const items = document.querySelectorAll('.action-item.done');
-  if (!items.length) { showToast('リセット対象がありません'); return; }
-
-  for (const item of items) {
-    const pageId = item.dataset.pageId;
-    if (!pageId) continue;
-    item.classList.remove('done');
-    try {
-      await patchPage(pageId, { 'ステータス': { status: { name: '未着手' } } });
-    } catch (e) {
-      console.error('リセット失敗:', e);
-    }
-  }
-  document.querySelectorAll('.action-list').forEach(list => updateProgress(list));
-  showToast('リセット完了');
-}
-
-// ── メイン初期化 ────────────────────────────────────────
-async function init() {
-  document.getElementById('updated-date').textContent =
-    '更新日: ' + new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-
-  const container = document.getElementById('themes-container');
-
-  try {
-    // テーマDB・タスクDB を並行取得
-    const [themesRes, tasksRes] = await Promise.all([
-      queryDB(THEME_DB, { sorts: [{ property: '番号', direction: 'ascending' }] }),
-      queryDB(TASK_DB),
-    ]);
-
-    // タスクをテーマ値でグルーピング
-    const tasksByTheme = {};
-    for (const task of tasksRes.results) {
-      const key = getSelect(task, 'テーマ');
-      if (!tasksByTheme[key]) tasksByTheme[key] = [];
-      tasksByTheme[key].push(task);
-    }
-
-    // テーマカードを描画
-    container.innerHTML = themesRes.results
-      .map((theme, idx) => buildThemeCard(theme, idx, tasksByTheme))
-      .join('');
-
-    // 進捗を初期表示
-    document.querySelectorAll('.action-list').forEach(list => updateProgress(list));
-
-    // テーマ横断サマリーを表示
-    updateThemeSummary();
-
-  } catch (e) {
-    console.error(e);
-    container.innerHTML = `
-      <div class="error-msg">
-        データの取得に失敗しました。<br>
-        <small style="opacity:0.75;">${esc(e.message)}</small><br>
-        <button onclick="init()">再試行</button>
-      </div>`;
-  }
-}
-
-init();
-</script>
+</div>
 </body>
 </html>
